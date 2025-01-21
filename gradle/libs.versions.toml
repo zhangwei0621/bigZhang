@@ -9,6 +9,10 @@ appcompat = "1.6.1"
 material = "1.10.0"
 activity = "1.8.0"
 constraintlayout = "2.1.4"
+comGoogleMlkitTranslate = "17.0.3"
+comGoogleMlkitTranslateLanguageId = "17.0.6"
+comGoogleMlkitTranslateTextRecognitionChinese = "16.0.1"
+glideVersion = "4.15.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -19,7 +23,10 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-
+com-google-mlkit-translate = { module = "com.google.mlkit:translate", version.ref = "comGoogleMlkitTranslate" }
+com-google-mlkit-language-id = { module = "com.google.mlkit:language-id", version.ref = "comGoogleMlkitTranslateLanguageId" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glideVersion" }
+com-google-mlkit-text-recognition-chinese = { module = "com.google.mlkit:text-recognition-chinese", version.ref = "comGoogleMlkitTranslateTextRecognitionChinese" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

@@ -33,6 +33,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -45,4 +48,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    //翻译
+    implementation(libs.com.google.mlkit.translate)
+    //语种识别
+    implementation(libs.com.google.mlkit.language.id)
+    //中文文字识别
+    implementation(libs.com.google.mlkit.text.recognition.chinese)
+    //Glide
+    implementation(libs.glide)
 }
