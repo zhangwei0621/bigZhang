@@ -13,7 +13,7 @@
         android:theme="@style/Theme.GoogleTranslateDemo"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".act.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,6 +21,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".act.TranslateActivity"
+            android:exported="false" />
+        <activity
+            android:name=".act.IndentifyLanguageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".act.IndentifyWordActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
