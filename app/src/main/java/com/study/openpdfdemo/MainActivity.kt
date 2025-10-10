@@ -22,7 +22,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun initView() {
         gmsScanHelper.register(this) {
-
+            if (it == null) return@register
+            gmsScanHelper.savePdf(this, it)
         }
         binding.apply {
             createPdf.setOnClickListener {

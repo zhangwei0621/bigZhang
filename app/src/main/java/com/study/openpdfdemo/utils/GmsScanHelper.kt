@@ -2,7 +2,9 @@ package com.study.openpdfdemo.utils
 
 import android.app.Activity
 import android.content.Context
+import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Environment
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,6 +13,7 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import java.io.File
+import java.io.FileOutputStream
 
 /**
  * 谷歌数字化文档工具;
@@ -19,26 +22,6 @@ import java.io.File
 class GmsScanHelper() {
 
     private var scannerLauncher: ActivityResultLauncher<IntentSenderRequest>? = null
-
-    /**
-     * 构建gms保存路径
-     */
-    fun getGmsSavePath(context: Context, name: String): String {
-        val saveFile = File(getGmsSaveDirPath(context), name)
-        return saveFile.absolutePath
-    }
-
-    /**
-     * 获取gms保存文件夹路径;
-     * 保存在应用内部目录,不用处理权限问题.即使保存到公共目录,9以下的还是需要权限;
-     */
-    fun getGmsSaveDirPath(context: Context): String {
-        val saveDir = File(context.filesDir, "digital_document")
-        if (!saveDir.exists()) {
-            saveDir.mkdirs()
-        }
-        return saveDir.absolutePath
-    }
 
     fun register(activity: FragmentActivity, onResult: (Uri?) -> Unit) {
         scannerLauncher =
@@ -75,5 +58,25 @@ class GmsScanHelper() {
             .addOnFailureListener {
                 onError.invoke(it.message)
             }
+    }
+
+    /**
+     * 保存pdf文件
+     */
+    fun savePdf(context: Context, pdfUri: Uri): String {
+        var targetFile =
+            File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOCUMENTS)
+        targetFile = File(targetFile, "${context.packageName}_${System.currentTimeMillis()}.pdf")
+        context.contentResolver.openInputStream(pdfUri).use { i ->
+            FileOutputStream(targetFile).use { o ->
+                i?.copyTo(o)
+            }
+        }
+        MediaScannerConnection.scanFile(
+            context,
+            arrayOf(targetFile.absolutePath),
+            null
+        ) { _: String?, _: Uri? -> }
+        return targetFile.absolutePath
     }
 }
