@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.study.googletranslatedemo"
+    namespace = "com.study.openpdfdemo"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.study.googletranslatedemo"
+        applicationId = "com.study.openpdfdemo"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -33,6 +33,10 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -45,4 +49,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    //openpdf
+    implementation("com.github.librepdf:openpdf:2.2.0")
+    //gms
+    implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta1")
+
 }

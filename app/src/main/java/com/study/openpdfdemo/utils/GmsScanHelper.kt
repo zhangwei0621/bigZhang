@@ -1,0 +1,79 @@
+package com.study.openpdfdemo.utils
+
+import android.app.Activity
+import android.content.Context
+import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.FragmentActivity
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
+import java.io.File
+
+/**
+ * 谷歌数字化文档工具;
+ * 无需相机权限,但需要谷歌服务,首次使用需要下载数据;
+ */
+class GmsScanHelper() {
+
+    private var scannerLauncher: ActivityResultLauncher<IntentSenderRequest>? = null
+
+    /**
+     * 构建gms保存路径
+     */
+    fun getGmsSavePath(context: Context, name: String): String {
+        val saveFile = File(getGmsSaveDirPath(context), name)
+        return saveFile.absolutePath
+    }
+
+    /**
+     * 获取gms保存文件夹路径;
+     * 保存在应用内部目录,不用处理权限问题.即使保存到公共目录,9以下的还是需要权限;
+     */
+    fun getGmsSaveDirPath(context: Context): String {
+        val saveDir = File(context.filesDir, "digital_document")
+        if (!saveDir.exists()) {
+            saveDir.mkdirs()
+        }
+        return saveDir.absolutePath
+    }
+
+    fun register(activity: FragmentActivity, onResult: (Uri?) -> Unit) {
+        scannerLauncher =
+            activity.registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+                if (Activity.RESULT_OK == it.resultCode) {
+                    val scanResult = GmsDocumentScanningResult.fromActivityResultIntent(it.data)
+                    onResult(scanResult?.pdf?.uri)
+                } else {
+                    onResult(null)
+                }
+            }
+    }
+
+    /**
+     * 启动gms文件扫描器
+     */
+    fun startScanner(activity: FragmentActivity, onError: (String?) -> Unit = {}) {
+        if (scannerLauncher == null) {
+            onError.invoke("register launcher missing")
+            return
+        }
+        val option = GmsDocumentScannerOptions.Builder()
+            .setGalleryImportAllowed(true)//允许导入本地图像
+            .setResultFormats(GmsDocumentScannerOptions.RESULT_FORMAT_PDF)//输出格式:PDF
+            .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL)//开启全部功能
+            .build()
+        val scanner = GmsDocumentScanning.getClient(option)
+        scanner.getStartScanIntent(activity)
+            .addOnSuccessListener {
+                scannerLauncher!!.launch(
+                    IntentSenderRequest.Builder(it).build()
+                )
+            }
+            .addOnFailureListener {
+                onError.invoke(it.message)
+            }
+    }
+}
