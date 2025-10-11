@@ -2,7 +2,6 @@ package com.study.openpdfdemo.utils
 
 import android.app.Activity
 import android.content.Context
-import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
 import androidx.activity.result.ActivityResultLauncher
@@ -72,11 +71,7 @@ class GmsScanHelper() {
                 i?.copyTo(o)
             }
         }
-        MediaScannerConnection.scanFile(
-            context,
-            arrayOf(targetFile.absolutePath),
-            null
-        ) { _: String?, _: Uri? -> }
+        Tools.refreshMedia(context, targetFile)
         return targetFile.absolutePath
     }
 }

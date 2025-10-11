@@ -1,6 +1,7 @@
 package com.study.openpdfdemo
 
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
@@ -15,8 +16,7 @@ class MainActivity : AppCompatActivity() {
 
     private val gmsScanHelper = GmsScanHelper()
 
-    private var newsPdfUrl: String = ""
-
+    private var createPdfPaths = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     private fun initView() {
         gmsScanHelper.register(this) {
             if (it == null) return@register
-            newsPdfUrl = gmsScanHelper.savePdf(this, it)
+            createPdfPaths += gmsScanHelper.savePdf(this, it)
         }
         binding.apply {
             createPdf.setOnClickListener {
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
                 decryptPdf()
             }
             mergePdf.setOnClickListener {
-                // TODO: 合并pdf
+                mergePdf()
             }
             splitPdf.setOnClickListener {
                 // TODO: 拆分pdf
@@ -63,28 +63,58 @@ class MainActivity : AppCompatActivity() {
      * 加密pdf
      */
     private fun encryptionPdf() {
-        if (newsPdfUrl.isEmpty()) return
-        val file = File(newsPdfUrl)
-        if (!file.exists()) return
-        if (PdfOps.isEncrypted(file)) {
-            Log.i("TAG", "encryptionPdf: 文件已加密")
+        val filePaths = createPdfPaths.firstOrNull()
+        if (filePaths.isNullOrEmpty()) {
+            Log.i(PdfOps.TAG, "encryptionPdf: 文件不存在")
             return
         }
-        PdfOps.encryptPdfInPlace(file, "123456",this)
+        val file = File(filePaths)
+        if (!file.exists()) {
+            Log.i(PdfOps.TAG, "encryptionPdf: 文件不存在")
+            return
+        }
+        if (PdfOps.isEncrypted(file)) {
+            Log.i(PdfOps.TAG, "encryptionPdf: 文件已加密")
+            return
+        }
+        PdfOps.encryptPdfPlace(this, file, "123456")
     }
 
     /**
      * 解密pdf
      */
     private fun decryptPdf() {
-        if (newsPdfUrl.isEmpty()) return
-        val file = File(newsPdfUrl)
-        if (!file.exists()) return
-        if (!PdfOps.isEncrypted(file)) {
-            Log.i("TAG", "encryptionPdf: 文件未加密")
+        val filePaths = createPdfPaths.firstOrNull()
+        if (filePaths.isNullOrEmpty()) {
+            Log.i(PdfOps.TAG, "decryptPdf: 文件不存在")
             return
         }
-        PdfOps.decryptPdfReplace(file, "123456",this)
+        val file = File(filePaths)
+        if (!file.exists()) {
+            Log.i(PdfOps.TAG, "decryptPdf: 文件不存在")
+            return
+        }
+        if (!PdfOps.isEncrypted(file)) {
+            Log.i(PdfOps.TAG, "decryptPdf: 文件未加密")
+            return
+        }
+        PdfOps.decryptPdfReplace(this, file, "123456")
+    }
+
+    /**
+     * 合并pdf
+     */
+    private fun mergePdf() {
+        //原pdf文件
+        val sourceFiles = createPdfPaths.map {
+            File(it)
+        }.filter { it.exists() }
+        //合并pdf文件
+        var targetFile =
+            File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOCUMENTS)
+        targetFile = File(targetFile, "${packageName}_${System.currentTimeMillis()}_merge.pdf")
+        //合并
+        PdfOps.mergePdfs(this, sourceFiles, targetFile)
     }
 
 }
