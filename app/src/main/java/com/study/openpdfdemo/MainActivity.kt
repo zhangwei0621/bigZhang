@@ -1,16 +1,21 @@
 package com.study.openpdfdemo
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import com.study.openpdfdemo.databinding.ActivityMainBinding
 import com.study.openpdfdemo.utils.GmsScanHelper
+import com.study.openpdfdemo.utils.PdfOps
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
     private val gmsScanHelper = GmsScanHelper()
+
+    private var newsPdfUrl: String = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     private fun initView() {
         gmsScanHelper.register(this) {
             if (it == null) return@register
-            gmsScanHelper.savePdf(this, it)
+            newsPdfUrl = gmsScanHelper.savePdf(this, it)
         }
         binding.apply {
             createPdf.setOnClickListener {
@@ -33,10 +38,10 @@ class MainActivity : AppCompatActivity() {
                 // TODO: 预览pdf
             }
             encryptionPdf.setOnClickListener {
-                // TODO: 加密pdf
+                encryptionPdf()
             }
             decryptPdf.setOnClickListener {
-                // TODO: 解密pdf
+                decryptPdf()
             }
             mergePdf.setOnClickListener {
                 // TODO: 合并pdf
@@ -47,8 +52,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    /**
+     * 创建pdf
+     */
     private fun createPdf() {
         gmsScanHelper.startScanner(this)
     }
+
+    /**
+     * 加密pdf
+     */
+    private fun encryptionPdf() {
+        if (newsPdfUrl.isEmpty()) return
+        val file = File(newsPdfUrl)
+        if (!file.exists()) return
+        if (PdfOps.isEncrypted(file)) {
+            Log.i("TAG", "encryptionPdf: 文件已加密")
+            return
+        }
+        PdfOps.encryptPdfInPlace(file, "123456",this)
+    }
+
+    /**
+     * 解密pdf
+     */
+    private fun decryptPdf() {
+        if (newsPdfUrl.isEmpty()) return
+        val file = File(newsPdfUrl)
+        if (!file.exists()) return
+        if (!PdfOps.isEncrypted(file)) {
+            Log.i("TAG", "encryptionPdf: 文件未加密")
+            return
+        }
+        PdfOps.decryptPdfReplace(file, "123456",this)
+    }
+
 }

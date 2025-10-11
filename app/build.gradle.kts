@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -51,7 +51,8 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     //openpdf
-    implementation("com.github.librepdf:openpdf:2.2.0")
+    implementation("com.github.librepdf:openpdf:1.3.43")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
     //gms
     implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta1")
 

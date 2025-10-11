@@ -1,5 +1,8 @@
 package com.study.openpdfdemo.utils
 
+import android.content.Context
+import android.media.MediaScannerConnection
+import android.net.Uri
 import com.lowagie.text.Document
 import com.lowagie.text.exceptions.BadPasswordException
 import com.lowagie.text.pdf.PdfCopy
@@ -9,6 +12,7 @@ import com.lowagie.text.pdf.PdfWriter
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 
 /**
  * author ZhangWei
@@ -16,48 +20,52 @@ import java.io.FileOutputStream
  */
 object PdfOps {
     /**
-     * 读取已有 PDF → 另存为加密版
-     * @param encryption 建议先用 PdfWriter.ENCRYPTION_AES_128
+     * 读取已有 PDF → 导出为加密的新文件
      */
-    fun encryptExistingPdf(
-        src: File,
-        dst: File,
-        userPwd: String,
-        ownerPwd: String,
-        permissions: Int = PdfWriter.ALLOW_PRINTING or PdfWriter.ALLOW_COPY,
-        encryption: Int = PdfWriter.ENCRYPTION_AES_128
-    ) {
-        ensureParent(dst)
-        // 使用二进制路径，避免 URI 兼容性问题
-        val reader = PdfReader(FileInputStream(src), null)
-        FileOutputStream(dst).use { fos ->
-            val stamper = PdfStamper(reader, fos)
-            stamper.setEncryption(
-                userPwd.toByteArray(),
-                ownerPwd.toByteArray(),
-                permissions,
-                encryption
-            )
-            stamper.close()
+    fun encryptPdfInPlace(src: File, pwd: String, context: Context) {
+        val tmp = File(src.parentFile, "${src.nameWithoutExtension}_enc.pdf")
+
+        PdfReader(FileInputStream(src)).use { reader ->
+            PdfStamper(reader, FileOutputStream(tmp)).use { stamper ->
+                stamper.setEncryption(
+                    pwd.toByteArray(),
+                    pwd.toByteArray(),
+                    PdfWriter.ALLOW_PRINTING or PdfWriter.ALLOW_COPY,
+                    PdfWriter.ENCRYPTION_AES_128
+                )
+            }
         }
-        reader.close()
+
+        if (!src.delete() || !tmp.renameTo(src)) {
+            tmp.delete()
+            throw IOException("无法替换原文件: ${src.absolutePath}")
+        }
+        MediaScannerConnection.scanFile(
+            context,
+            arrayOf(src.absolutePath),
+            null
+        ) { _: String?, _: Uri? -> }
     }
 
     /**
      * 解除加密（需要 ownerPwd），导出为不加密的新文件
      */
-    fun decryptPdf(
-        srcEncrypted: File,
-        dstDecrypted: File,
-        ownerPwd: String
-    ) {
-        ensureParent(dstDecrypted)
-        val reader = PdfReader(FileInputStream(srcEncrypted), ownerPwd.toByteArray())
-        FileOutputStream(dstDecrypted).use { fos ->
-            val stamper = PdfStamper(reader, fos) // 不调用 setEncryption => 输出不加密
-            stamper.close()
+    fun decryptPdfReplace(src: File, pwd: String, context: Context) {
+        val tmp = File(src.parentFile, "${src.nameWithoutExtension}_dec.pdf")
+
+        PdfReader(FileInputStream(src), pwd.toByteArray()).use { reader ->
+            PdfStamper(reader, FileOutputStream(tmp)).use { }
         }
-        reader.close()
+
+        if (!src.delete() || !tmp.renameTo(src)) {
+            tmp.delete()
+            throw IOException("无法替换原文件: ${src.absolutePath}")
+        }
+        MediaScannerConnection.scanFile(
+            context,
+            arrayOf(src.absolutePath),
+            null
+        ) { _: String?, _: Uri? -> }
     }
 
     /**
@@ -70,9 +78,10 @@ object PdfOps {
             val encrypted = reader.isEncrypted
             reader.close()
             encrypted
-        } catch (e: BadPasswordException) {
-            true // 文件确实被加密，只是没提供密码
-        } catch (e: Exception) {
+        } catch (_: BadPasswordException) {
+            // 文件确实被加密，只是没提供密码
+            true
+        } catch (_: Exception) {
             // 其他错误，不认为是加密（可能是损坏）
             false
         }
