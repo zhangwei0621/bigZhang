@@ -53,6 +53,8 @@ dependencies {
     //openpdf
     implementation("com.github.librepdf:openpdf:1.3.43")
     implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
+    //openpdf渲染器，渲染pdf页面
+    implementation("com.github.librepdf:openpdf-renderer:2.2.4")
     //gms
     implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta1")
 
