@@ -108,7 +108,7 @@ object PdfOps {
             val copy = PdfCopy(doc, fos)
             doc.open()
             inputs.forEach { f ->
-                openReader(f, null).use { r ->
+                PdfReader(FileInputStream(f)).use { r ->
                     for (i in 1..r.numberOfPages) {
                         val page = copy.getImportedPage(r, i)
                         copy.addPage(page)
@@ -125,47 +125,38 @@ object PdfOps {
 
 
     /**
-     * 按页拆分：将指定 PDF 拆成多个单页 PDF
-     * @param pages 需要导出的页码（1-based），为空表示拆成单页全集
-     * @return 输出文件列表（与页码对应）
+     *选取n个随机页面拆分成新PDF
      */
-    fun splitPdfByPages(
-        src: File,
-        outDir: File,
-        pages: List<Int>? = null,
-        passwordIfAny: String? = null,
-        fileNameFactory: (pageIndex: Int) -> String = { i -> "page_$i.pdf" }
-    ): List<File> {
-        outDir.mkdirs()
-        val files = mutableListOf<File>()
-
-        openReader(src, passwordIfAny).use { reader ->
-            val total = reader.numberOfPages
-            val targetPages = (pages?.toSet()?.filter { it in 1..total } ?: (1..total).toList())
-            targetPages.forEach { p ->
-                val outFile = File(outDir, fileNameFactory(p))
-                ensureParent(outFile)
-                val doc = Document(reader.getPageSizeWithRotation(p))
-                FileOutputStream(outFile).use { fos ->
+    fun randomPageSplitPdf(
+        context: Context,
+        input: File,
+        output: File,
+    ) = runCatching {
+        FileInputStream(input).use { fis ->
+            PdfReader(fis).use {
+                val total = it.numberOfPages
+                val selected = (1..total)
+                    .shuffled()
+                    .take(minOf(3, total - 1))
+                    .sorted()
+                val doc = Document()
+                FileOutputStream(output).use { fos ->
                     val copy = PdfCopy(doc, fos)
                     doc.open()
-                    copy.addPage(copy.getImportedPage(reader, p))
+                    selected.forEach { page ->
+                        val imported = copy.getImportedPage(it, page)
+                        copy.addPage(imported)
+                    }
                     doc.close()
                 }
-                files.add(outFile)
             }
         }
-        return files
+        Log.i(TAG, "拆分成功")
+        Tools.refreshMedia(context, output)
+    }.getOrElse {
+        Log.i(TAG, "拆分失败")
     }
 
-    // ============== 工具 ==============
-    private fun openReader(file: File, passwordIfAny: String? = null): PdfReader {
-        return if (passwordIfAny.isNullOrEmpty()) {
-            PdfReader(FileInputStream(file))
-        } else {
-            PdfReader(FileInputStream(file), passwordIfAny.toByteArray())
-        }
-    }
 
     private fun PdfReader.use(block: (PdfReader) -> Unit) {
         try {
@@ -178,7 +169,4 @@ object PdfOps {
         }
     }
 
-    private fun ensureParent(file: File) {
-        file.parentFile?.mkdirs()
-    }
 }

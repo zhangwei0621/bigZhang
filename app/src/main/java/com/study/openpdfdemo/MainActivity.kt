@@ -47,10 +47,11 @@ class MainActivity : AppCompatActivity() {
                 mergePdf()
             }
             splitPdf.setOnClickListener {
-                // TODO: 拆分pdf
+                splitPdf()
             }
         }
     }
+
 
     /**
      * 创建pdf
@@ -115,6 +116,27 @@ class MainActivity : AppCompatActivity() {
         targetFile = File(targetFile, "${packageName}_${System.currentTimeMillis()}_merge.pdf")
         //合并
         PdfOps.mergePdfs(this, sourceFiles, targetFile)
+    }
+
+    /**
+     * 拆分pdf
+     */
+    private fun splitPdf() {
+        val filePaths = createPdfPaths.firstOrNull()
+        if (filePaths.isNullOrEmpty()) {
+            Log.i(PdfOps.TAG, "decryptPdf: 文件不存在")
+            return
+        }
+        val file = File(filePaths)
+        if (!file.exists()) {
+            Log.i(PdfOps.TAG, "decryptPdf: 文件不存在")
+            return
+        }
+        //拆分pdf文件
+        var targetFile =
+            File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOCUMENTS)
+        targetFile = File(targetFile, "${packageName}_${System.currentTimeMillis()}_split.pdf")
+        PdfOps.randomPageSplitPdf(this,file, targetFile)
     }
 
 }
