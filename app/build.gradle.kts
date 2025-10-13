@@ -52,7 +52,7 @@ dependencies {
 
     //openpdf
     implementation("com.github.librepdf:openpdf:1.3.43")
-    implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
+//    implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
     implementation("org.bouncycastle:bcutil-jdk15to18:1.77")
     //openpdf渲染器，渲染pdf页面
     implementation("com.github.librepdf:openpdf-renderer:2.2.4")

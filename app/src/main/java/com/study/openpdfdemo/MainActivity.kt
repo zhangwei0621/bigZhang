@@ -1,6 +1,5 @@
 package com.study.openpdfdemo
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -9,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.study.openpdfdemo.databinding.ActivityMainBinding
 import com.study.openpdfdemo.utils.GmsScanHelper
 import com.study.openpdfdemo.utils.PdfOps
-import com.study.openpdfdemo.utils.StorageHelper
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -18,9 +16,6 @@ class MainActivity : AppCompatActivity() {
 
     private val gmsScanHelper = GmsScanHelper()
 
-    private var newsPdfUrl: String = ""
-
-    private val storageHelper = StorageHelper()
     private var createPdfPaths = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,19 +30,12 @@ class MainActivity : AppCompatActivity() {
             if (it == null) return@register
             createPdfPaths += gmsScanHelper.savePdf(this, it)
         }
-        storageHelper.register(this) {
-        }
         binding.apply {
             createPdf.setOnClickListener {
                 createPdf()
             }
             previewPdf.setOnClickListener {
-                // TODO: 预览pdf
-                if (!StorageHelper.hasPermissions(this@MainActivity)) {
-                    storageHelper.launch()
-                    return@setOnClickListener
-                }
-                startActivity(Intent(this@MainActivity, PdfViewerActivity::class.java))
+                previewPdf()
             }
             encryptionPdf.setOnClickListener {
                 encryptionPdf()
@@ -62,6 +50,10 @@ class MainActivity : AppCompatActivity() {
                 splitPdf()
             }
         }
+    }
+
+    private fun previewPdf() {
+        PdfViewerActivity.start(this)
     }
 
 
@@ -148,7 +140,7 @@ class MainActivity : AppCompatActivity() {
         var targetFile =
             File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOCUMENTS)
         targetFile = File(targetFile, "${packageName}_${System.currentTimeMillis()}_split.pdf")
-        PdfOps.randomPageSplitPdf(this,file, targetFile)
+        PdfOps.randomPageSplitPdf(this, file, targetFile)
     }
 
 }
