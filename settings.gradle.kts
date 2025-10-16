@@ -18,6 +18,7 @@ dependencyResolutionManagement {
         mavenCentral()
 
         maven("https://jitpack.io")
+        maven("https://maven.ghostscript.com/")
     }
 }
 

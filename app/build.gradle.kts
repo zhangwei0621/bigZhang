@@ -59,4 +59,6 @@ dependencies {
     //gms
     implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta1")
 
+    //mupdf仅用于渲染，目前没有较好的渲染器。观察openpdf的编辑效果
+    implementation("com.artifex.mupdf:fitz:1.26.10")
 }
