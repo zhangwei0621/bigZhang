@@ -11,9 +11,9 @@ import com.lowagie.text.pdf.PdfAnnotation
 import com.study.openpdfdemo.databinding.ActivityPdfViewerBinding
 import com.study.openpdfdemo.utils.TextStripper
 import com.study.openpdfdemo.utils.toast
-import com.study.openpdfdemo.viewer.PDFColorWrap
 import com.study.openpdfdemo.viewer.PdfCoreCore
-import com.study.openpdfdemo.viewer.PdfViewerOverlay
+import com.study.openpdfdemo.viewer.view.PdfViewerOverlay
+import com.study.openpdfdemo.viewer.data.PDFColorWrap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.io.File

@@ -1,4 +1,4 @@
-package com.study.openpdfdemo.viewer
+package com.study.openpdfdemo.viewer.view
 
 import android.content.Context
 import android.graphics.Bitmap

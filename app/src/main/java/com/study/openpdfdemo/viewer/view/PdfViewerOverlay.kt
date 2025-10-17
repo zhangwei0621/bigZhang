@@ -1,4 +1,4 @@
-package com.study.openpdfdemo.viewer
+package com.study.openpdfdemo.viewer.view
 
 import android.annotation.SuppressLint
 import android.content.Context

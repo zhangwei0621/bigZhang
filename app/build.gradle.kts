@@ -52,13 +52,9 @@ dependencies {
 
     //openpdf
     implementation("com.github.librepdf:openpdf:1.3.43")
-//    implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
     implementation("org.bouncycastle:bcutil-jdk15to18:1.77")
-    //openpdf渲染器，渲染pdf页面
-    implementation("com.github.librepdf:openpdf-renderer:2.2.4")
     //gms
     implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta1")
-
-    //mupdf仅用于渲染，目前没有较好的渲染器。观察openpdf的编辑效果
-    implementation("com.artifex.mupdf:fitz:1.26.10")
+    //pdfium库，其中一个第三方修改的库，添加了AndroidX和16KB的支持，但是Kotlin要求到2.2.0
+    implementation("io.legere:pdfiumandroid:1.0.34")
 }
