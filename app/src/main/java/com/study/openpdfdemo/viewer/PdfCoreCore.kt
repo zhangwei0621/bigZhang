@@ -44,6 +44,9 @@ class PdfCoreCore(
         pageCount = _pdfReader.numberOfPages
     }
 
+    /**
+     * 设置侦听以便接收Redo、Undo之类的状态
+     */
     fun setCoreListener(listener: PdfCoreListener?) {
         _coreListener = listener
         getEditHelper()?.setCoreListener(_coreListener)
@@ -194,7 +197,8 @@ class PdfCoreCore(
     @Synchronized
     private fun getEditHelper(): PdfEditHelper? {
         if (_editHelper == null) {
-            _editHelper = PdfEditHelper(file, _editCacheDir, _coreListener)
+            _editHelper = PdfEditHelper(file, _editCacheDir)
+            _editHelper?.setCoreListener(_coreListener)
         }
         return _editHelper
     }

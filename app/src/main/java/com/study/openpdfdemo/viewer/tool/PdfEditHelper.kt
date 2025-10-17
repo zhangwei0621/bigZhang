@@ -10,25 +10,24 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * openpdf编辑辅助工具。
+ * openpdf编辑辅助工具
+ * @param file 原始文件
+ * @param cacheDir 工作缓存目录
  */
 class PdfEditHelper(
-    /**
-     * 原始文件
-     */
     private val file: File,
-
-    /**
-     * 工作缓存目录
-     */
     private val cacheDir: File,
-
-    private var coreListener: PdfCoreListener?
 ) {
+    //预览文件，暂存操作效果到该文件
     private var previewFile: File? = null
-    private var _stamper: PdfStamper? = null
+
+    //是否可以保存
     private val _needSave = AtomicBoolean(false)
+
+    //操作栈实现
     private val operationStack = OperationStack()
+
+    private var coreListener: PdfCoreListener? = null
 
     init {
         initData()
@@ -47,16 +46,14 @@ class PdfEditHelper(
      * 执行Stamper编辑操作，此方法执行的编辑操作将记录为一次操作并记入操作栈
      */
     fun executeStamperOperation(working: (PdfStamper) -> Unit) {
-        // TODO: 实现redo和undo
         previewFile?.let { previewFile ->
             val reader = PdfReader(previewFile.absolutePath)
             val outputStream = ByteArrayOutputStream()
-            _stamper = PdfStamper(reader, outputStream)
+            val stamper = PdfStamper(reader, outputStream)
             //执行编辑工作
-            _stamper?.let { working.invoke(it) }
+            stamper.let { working.invoke(it) }
             //关闭写入，数据开始写入到outputStream
-            _stamper?.close()
-            _stamper = null
+            stamper.close()
             reader.close()
             outputStream.writeToFile(previewFile)
             operationStack.add(outputStream)
@@ -123,7 +120,6 @@ class PdfEditHelper(
      * 销毁，删除缓存文件。销毁之后这个对象就不能复用了，需要重新生成。
      */
     fun destroy() {
-        _stamper?.close()
         previewFile?.delete()
         operationStack.destroy()
     }
