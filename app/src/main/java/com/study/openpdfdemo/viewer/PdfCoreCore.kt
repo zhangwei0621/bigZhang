@@ -15,6 +15,7 @@ import com.study.openpdfdemo.utils.TextStripper
 import com.study.openpdfdemo.utils.toQuad
 import com.study.openpdfdemo.viewer.data.PDFAnnot
 import com.study.openpdfdemo.viewer.data.PDFColorWrap
+import com.study.openpdfdemo.viewer.tool.PdfCoreListener
 import com.study.openpdfdemo.viewer.tool.PdfEditHelper
 import io.legere.pdfiumandroid.PdfiumCore
 import java.io.File
@@ -33,7 +34,8 @@ class PdfCoreCore(
     private var _pdfReader: PdfReader = PdfReader(file.absolutePath)
     private val _editCacheDir = File(context.cacheDir, "stamper_cache/")
     private var _editHelper: PdfEditHelper? = null
-    private val pdfiumCore = PdfiumCore()
+    private val _pdfiumCore = PdfiumCore()
+    private var _coreListener: PdfCoreListener? = null
 
     var pageCount: Int = 0
         private set
@@ -41,6 +43,15 @@ class PdfCoreCore(
     init {
         pageCount = _pdfReader.numberOfPages
     }
+
+    fun setCoreListener(listener: PdfCoreListener?) {
+        _coreListener = listener
+        getEditHelper()?.setCoreListener(_coreListener)
+    }
+
+    fun undo(): Boolean = getEditHelper()?.undo() == true
+
+    fun redo(): Boolean = getEditHelper()?.redo() == true
 
     /**
      * 销毁Core对象
@@ -61,7 +72,7 @@ class PdfCoreCore(
      * 抛弃编辑操作
      */
     fun abandonSave() {
-        _editHelper?.initData()
+        _editHelper?.abandonSave()
     }
 
     /**
@@ -78,7 +89,7 @@ class PdfCoreCore(
             val fd = ParcelFileDescriptor(
                 ParcelFileDescriptor.open(targetFile, ParcelFileDescriptor.MODE_READ_ONLY)
             )
-            val doc = pdfiumCore.newDocument(fd)
+            val doc = _pdfiumCore.newDocument(fd)
             val pdfPage = doc.openPage(pageIndex)
             //由于pdfium获取页面大小是经过dpi换算的，不是原始大小，这里使用openpdf的接口
             val pageSize = _pdfReader.getPageSize(page)
@@ -183,7 +194,7 @@ class PdfCoreCore(
     @Synchronized
     private fun getEditHelper(): PdfEditHelper? {
         if (_editHelper == null) {
-            _editHelper = PdfEditHelper(file, _editCacheDir)
+            _editHelper = PdfEditHelper(file, _editCacheDir, _coreListener)
         }
         return _editHelper
     }

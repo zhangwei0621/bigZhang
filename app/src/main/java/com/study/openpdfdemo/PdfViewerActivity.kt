@@ -12,8 +12,9 @@ import com.study.openpdfdemo.databinding.ActivityPdfViewerBinding
 import com.study.openpdfdemo.utils.TextStripper
 import com.study.openpdfdemo.utils.toast
 import com.study.openpdfdemo.viewer.PdfCoreCore
-import com.study.openpdfdemo.viewer.view.PdfViewerOverlay
 import com.study.openpdfdemo.viewer.data.PDFColorWrap
+import com.study.openpdfdemo.viewer.tool.PdfCoreListener
+import com.study.openpdfdemo.viewer.view.PdfViewerOverlay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
@@ -112,6 +113,27 @@ class PdfViewerActivity : AppCompatActivity() {
             toolStateFlow.collect {
                 binding.demoViewer.setToolState(it)
                 binding.btnTool.text = "激活工具：${it.toolName}"
+            }
+        }
+        pdfCoreCore.setCoreListener(object : PdfCoreListener {
+            override fun onRedoUndoStateChanged(canUndo: Boolean, canRedo: Boolean) {
+                binding.btnUndo.isEnabled = canUndo
+                binding.btnRedo.isEnabled = canRedo
+            }
+
+            override fun onSaveStateChanged(needSave: Boolean) {
+                binding.btnSave.isEnabled = needSave
+                binding.btnDontSave.isEnabled = needSave
+            }
+        })
+        binding.btnUndo.setOnClickListener {
+            if (pdfCoreCore.undo()) {
+                renderCurrentPage()
+            }
+        }
+        binding.btnRedo.setOnClickListener {
+            if (pdfCoreCore.redo()) {
+                renderCurrentPage()
             }
         }
     }

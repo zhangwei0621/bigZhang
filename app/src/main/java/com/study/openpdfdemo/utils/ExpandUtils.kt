@@ -48,6 +48,16 @@ fun File.copyTo(destFile: File): Boolean {
 }
 
 /**
+ * 将文件复制为[ByteArrayOutputStream]
+ */
+fun File.copyAsByteArrayOS(): ByteArrayOutputStream {
+    val result = ByteArrayOutputStream()
+    val fis = FileInputStream(this)
+    result.write(fis.readBytes())
+    return result
+}
+
+/**
  * 将该流写入目标文件中
  */
 fun ByteArrayOutputStream.writeToFile(destFile: File): Boolean {
