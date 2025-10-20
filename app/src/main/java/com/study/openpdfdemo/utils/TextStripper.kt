@@ -10,7 +10,9 @@ import kotlin.math.abs
 /**
  * PDF文本提取器。注意使用前先调用PdfBox的初始化。
  */
-class TextStripper : PDFTextStripper() {
+class TextStripper(
+    private val password: String = ""
+) : PDFTextStripper() {
     init {
         // 按照视觉顺序抓取文本
         sortByPosition = true
@@ -86,16 +88,14 @@ class TextStripper : PDFTextStripper() {
 
     fun extract(file: File, page: Int, lineMergeTolerance: Float = 2f): List<Line> {
         try {
-            PDDocument.load(file).use { doc ->
-                val stripper = TextStripper().apply {
-                    //设置页面
-                    startPage = page
-                    endPage = page
+            PDDocument.load(file, password).use { doc ->
+                //设置页面
+                startPage = page
+                endPage = page
 
-                    //触发抓取
-                    getText(doc)
-                }
-                return stripper.toStructured(lineMergeTolerance)
+                //触发抓取
+                getText(doc)
+                return toStructured(lineMergeTolerance)
             }
         } catch (e: Exception) {
             e.printStackTrace()

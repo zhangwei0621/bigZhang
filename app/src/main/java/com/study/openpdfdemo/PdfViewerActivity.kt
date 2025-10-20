@@ -27,6 +27,8 @@ class PdfViewerActivity : AppCompatActivity() {
     private lateinit var pdfCoreCore: PdfCoreCore
     private var current = 1
     private val toolStateFlow = MutableStateFlow(DemoToolState.Nothing)
+    private val testFile = "ASM4_2.pdf"
+    private val testLockedFile = "ASM4_2_locked_password_111.pdf"
 
     companion object {
         fun start(context: Context) {
@@ -43,9 +45,9 @@ class PdfViewerActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        val testFile = copyPdfFromAssets(this, "ASM4_2.pdf", false)
+        val testFile = copyPdfFromAssets(this, testFile, false)
         if (!testFile.exists()) return
-        pdfCoreCore = PdfCoreCore(testFile, this)
+        pdfCoreCore = PdfCoreCore(testFile, "111", this)
         binding.tvPath.text = testFile.absolutePath
         binding.btnRefreshPage.setOnClickListener {
             renderCurrentPage()

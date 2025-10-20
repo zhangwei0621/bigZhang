@@ -2,21 +2,26 @@ package com.study.openpdfdemo.viewer.tool
 
 import com.lowagie.text.pdf.PdfReader
 import com.lowagie.text.pdf.PdfStamper
+import com.lowagie.text.pdf.PdfWriter
 import com.study.openpdfdemo.utils.copyAsByteArrayOS
 import com.study.openpdfdemo.utils.copyTo
 import com.study.openpdfdemo.utils.writeToFile
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * openpdf编辑辅助工具
  * @param file 原始文件
  * @param cacheDir 工作缓存目录
+ * @param password 密码。如果文件有加密，需要密码才能编辑。编辑过程中的文件是没用加密的。如果该参数不为空字符串，保存时才会将密码重新写入到输出文件中。
  */
 class PdfEditHelper(
     private val file: File,
     private val cacheDir: File,
+    private val password: String = ""
 ) {
     //预览文件，暂存操作效果到该文件
     private var previewFile: File? = null
@@ -39,6 +44,7 @@ class PdfEditHelper(
             operationStack.canUndo,
             operationStack.canRedo
         )
+        coreListener?.onSaveStateChanged(_needSave.get())
     }
 
     /**
@@ -51,7 +57,7 @@ class PdfEditHelper(
      */
     fun executeStamperOperation(working: (PdfStamper) -> Unit) {
         previewFile?.let { previewFile ->
-            val reader = PdfReader(previewFile.absolutePath)
+            val reader = PdfReader(previewFile.absolutePath, password.toByteArray())
             val outputStream = ByteArrayOutputStream()
             val stamper = PdfStamper(reader, outputStream)
             //执行编辑工作
@@ -77,7 +83,24 @@ class PdfEditHelper(
         if (_needSave.getAndSet(false)) {
             previewFile?.let { previewFile ->
                 //写到正式文件中
-                previewFile.copyTo(file)
+                if (password.isNotEmpty()) {
+                    FileInputStream(previewFile).use { fis ->
+                        PdfReader(fis, password.toByteArray()).use { reader ->
+                            FileOutputStream(file).use { fos ->
+                                PdfStamper(reader, fos).use { stamper ->
+                                    stamper.setEncryption(
+                                        password.toByteArray(),
+                                        password.toByteArray(),
+                                        PdfWriter.ALLOW_COPY or PdfWriter.ALLOW_COPY,
+                                        PdfWriter.ENCRYPTION_AES_128
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    previewFile.copyTo(file)
+                }
                 //重置操作栈数据
                 operationStack.clear()
                 operationStack.setOriginalStream(previewFile.copyAsByteArrayOS())

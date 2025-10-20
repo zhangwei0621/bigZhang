@@ -20,7 +20,6 @@ import com.study.openpdfdemo.viewer.tool.PdfEditHelper
 import io.legere.pdfiumandroid.PdfiumCore
 import java.io.File
 import kotlin.math.min
-import kotlin.random.Random
 
 /**
  * PDF核心工具类，主要使用OpenPDF。对外接口的页码都从1开始。
@@ -28,10 +27,11 @@ import kotlin.random.Random
 // TODO: 考虑文件加密情况
 class PdfCoreCore(
     val file: File,
+    val password: String = "",
     context: Context
 ) {
     private val tag = "PDFCore"
-    private var _pdfReader: PdfReader = PdfReader(file.absolutePath)
+    private var _pdfReader: PdfReader = PdfReader(file.absolutePath, password.toByteArray())
     private val _editCacheDir = File(context.cacheDir, "stamper_cache/")
     private var _editHelper: PdfEditHelper? = null
     private val _pdfiumCore = PdfiumCore()
@@ -49,7 +49,13 @@ class PdfCoreCore(
      */
     fun setCoreListener(listener: PdfCoreListener?) {
         _coreListener = listener
-        getEditHelper()?.setCoreListener(_coreListener)
+        _editHelper?.setCoreListener(_coreListener) ?: run {
+            _coreListener?.onRedoUndoStateChanged(
+                canUndo = false,
+                canRedo = false
+            )
+            _coreListener?.onSaveStateChanged(false)
+        }
     }
 
     fun undo(): Boolean = getEditHelper()?.undo() == true
@@ -92,7 +98,7 @@ class PdfCoreCore(
             val fd = ParcelFileDescriptor(
                 ParcelFileDescriptor.open(targetFile, ParcelFileDescriptor.MODE_READ_ONLY)
             )
-            val doc = _pdfiumCore.newDocument(fd)
+            val doc = _pdfiumCore.newDocument(fd, password)
             val pdfPage = doc.openPage(pageIndex)
             //由于pdfium获取页面大小是经过dpi换算的，不是原始大小，这里使用openpdf的接口
             val pageSize = _pdfReader.getPageSize(page)
@@ -112,55 +118,8 @@ class PdfCoreCore(
         return null
     }
 
-    /**
-     * 仅测试使用。为指定页面所有可结构化的文本添加TextMarkup注解。
-     */
-    fun executeMarkupTest(page: Int, type: Int, color: PDFColorWrap) {
-        getEditHelper()?.executeStamperOperation { stamper ->
-            val lines = TextStripper().extract(file, page)
-            lines.forEach { line ->
-                val rect = line.getLineRect(false)
-                if (rect != null) {
-                    val annotWrap = PDFAnnot.MarkupAnnotWrap(
-                        rect,
-                        type,
-                        color,
-                        rect.toQuad()
-                    )
-                    addMarkupAnnotation(page, annotWrap, stamper)
-                }
-            }
-        }
-    }
-
-    /**
-     * 仅测试使用。为指定页面添加随机Ink注解。
-     */
-    fun executeInkTest(page: Int, color: PDFColorWrap) {
-        getEditHelper()?.executeStamperOperation { stamper ->
-            val rect = _pdfReader.getPageSize(page)
-            val randomX = { Random.nextInt(0, rect.width.toInt()).toFloat() }
-            val randomY = { Random.nextInt(0, rect.height.toInt()).toFloat() }
-            //若干点组成的一条线
-            val line = floatArrayOf(
-                randomX(), randomY(),
-                randomX(), randomY(),
-                randomX(), randomY(),
-                randomX(), randomY(),
-                randomX(), randomY(),
-            )
-            val annotWrap = PDFAnnot.InkAnnotWrap(
-                rect,
-                color,
-                4f,
-                line
-            )
-            addInkAnnotation(page, annotWrap, stamper)
-        }
-    }
-
     fun requireStructuredText(page: Int): List<TextStripper.Line> {
-        return TextStripper().extract(file, page)
+        return TextStripper(password).extract(file, page)
     }
 
     fun addInk(page: Int, line: FloatArray, color: PDFColorWrap) {
@@ -197,7 +156,7 @@ class PdfCoreCore(
     @Synchronized
     private fun getEditHelper(): PdfEditHelper? {
         if (_editHelper == null) {
-            _editHelper = PdfEditHelper(file, _editCacheDir)
+            _editHelper = PdfEditHelper(file, _editCacheDir, password)
             _editHelper?.setCoreListener(_coreListener)
         }
         return _editHelper
