@@ -35,6 +35,10 @@ class PdfEditHelper(
 
     fun setCoreListener(listener: PdfCoreListener?) {
         coreListener = listener
+        coreListener?.onRedoUndoStateChanged(
+            operationStack.canUndo,
+            operationStack.canRedo
+        )
     }
 
     /**
