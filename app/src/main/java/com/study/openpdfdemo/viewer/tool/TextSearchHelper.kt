@@ -1,6 +1,6 @@
 package com.study.openpdfdemo.viewer.tool
 
-import com.study.openpdfdemo.utils.TextStripper
+import com.study.openpdfdemo.viewer.tool.TextStripper
 import com.study.openpdfdemo.viewer.data.TextSearchData
 
 /**

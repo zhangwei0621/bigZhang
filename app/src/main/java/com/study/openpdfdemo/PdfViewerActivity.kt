@@ -9,13 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.lowagie.text.pdf.PdfAnnotation
 import com.study.openpdfdemo.databinding.ActivityPdfViewerBinding
-import com.study.openpdfdemo.utils.TextStripper
 import com.study.openpdfdemo.utils.toast
 import com.study.openpdfdemo.viewer.PdfCoreCore
 import com.study.openpdfdemo.viewer.data.PDFColorWrap
 import com.study.openpdfdemo.viewer.tool.PdfCoreListener
 import com.study.openpdfdemo.viewer.tool.PdfOverlayListener
 import com.study.openpdfdemo.viewer.tool.TextSearchHelper
+import com.study.openpdfdemo.viewer.tool.TextStripper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
@@ -27,8 +27,8 @@ class PdfViewerActivity : AppCompatActivity() {
     private lateinit var pdfCoreCore: PdfCoreCore
     private var current = 1
     private val toolStateFlow = MutableStateFlow(DemoToolState.Nothing)
-    private val testFile = "ASM4_2.pdf"
-    private val testLockedFile = "ASM4_2_locked_password_111.pdf"
+    private val testAsset = "ASM4_2.pdf"
+    private val testLockedAsset = "ASM4_2_locked_password_111.pdf"
 
     companion object {
         fun start(context: Context) {
@@ -45,10 +45,10 @@ class PdfViewerActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        val testFile = copyPdfFromAssets(this, testFile, false)
-        if (!testFile.exists()) return
-        pdfCoreCore = PdfCoreCore(testFile, "111", this)
-        binding.tvPath.text = testFile.absolutePath
+        val file = copyPdfFromAssets(this, testAsset, false)
+        if (!file.exists()) return
+        pdfCoreCore = PdfCoreCore(file, "111", PdfCoreCore.getCacheDir(this))
+        binding.tvPath.text = file.absolutePath
         binding.btnRefreshPage.setOnClickListener {
             renderCurrentPage()
         }

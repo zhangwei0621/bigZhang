@@ -1,7 +1,7 @@
 package com.study.openpdfdemo.viewer.data
 
 import android.graphics.PointF
-import com.study.openpdfdemo.utils.TextStripper
+import com.study.openpdfdemo.viewer.tool.TextStripper
 
 /**
  * 搜索结果数据

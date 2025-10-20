@@ -13,9 +13,9 @@ import android.view.View
 import androidx.core.graphics.toColorInt
 import com.lowagie.text.Rectangle
 import com.study.openpdfdemo.PdfViewerActivity
-import com.study.openpdfdemo.utils.TextStripper
 import com.study.openpdfdemo.utils.isCross
 import com.study.openpdfdemo.viewer.tool.PdfOverlayListener
+import com.study.openpdfdemo.viewer.tool.TextStripper
 import kotlin.math.abs
 
 /**

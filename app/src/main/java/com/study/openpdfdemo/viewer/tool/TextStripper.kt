@@ -1,4 +1,4 @@
-package com.study.openpdfdemo.utils
+package com.study.openpdfdemo.viewer.tool
 
 import com.lowagie.text.Rectangle
 import com.tom_roush.pdfbox.pdmodel.PDDocument

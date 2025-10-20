@@ -11,28 +11,35 @@ import com.lowagie.text.pdf.PdfBorderArray
 import com.lowagie.text.pdf.PdfName
 import com.lowagie.text.pdf.PdfReader
 import com.lowagie.text.pdf.PdfStamper
-import com.study.openpdfdemo.utils.TextStripper
 import com.study.openpdfdemo.utils.toQuad
 import com.study.openpdfdemo.viewer.data.PDFAnnot
 import com.study.openpdfdemo.viewer.data.PDFColorWrap
 import com.study.openpdfdemo.viewer.tool.PdfCoreListener
 import com.study.openpdfdemo.viewer.tool.PdfEditHelper
+import com.study.openpdfdemo.viewer.tool.TextStripper
 import io.legere.pdfiumandroid.PdfiumCore
 import java.io.File
 import kotlin.math.min
 
 /**
  * PDF核心工具类，主要使用OpenPDF。对外接口的页码都从1开始。
+ * @param editCacheDir 缓存路径。编辑过程中存放缓存的文件夹。
  */
-// TODO: 考虑文件加密情况
 class PdfCoreCore(
     val file: File,
     val password: String = "",
-    context: Context
+    private val editCacheDir: File
 ) {
-    private val tag = "PDFCore"
+    companion object{
+        const val TAG = "PDFCore"
+
+        fun getCacheDir(context: Context): File{
+            return File(context.cacheDir,"stamper_cache")
+        }
+    }
+
+    // TODO: 对文件大小有限制 大文件会OOM
     private var _pdfReader: PdfReader = PdfReader(file.absolutePath, password.toByteArray())
-    private val _editCacheDir = File(context.cacheDir, "stamper_cache/")
     private var _editHelper: PdfEditHelper? = null
     private val _pdfiumCore = PdfiumCore()
     private var _coreListener: PdfCoreListener? = null
@@ -93,6 +100,7 @@ class PdfCoreCore(
         containerHeight: Int
     ): Pair<Float, Bitmap>? {
         try {
+            val start = System.currentTimeMillis()
             val targetFile = _editHelper?.getPreviewFile() ?: file
             val pageIndex = page - 1
             val fd = ParcelFileDescriptor(
@@ -111,9 +119,11 @@ class PdfCoreCore(
             pdfPage.close()
             doc.close()
             fd.close()
+            val end = System.currentTimeMillis()
+            Log.d(TAG, "render time：${(end - start) / 1000f}")
             return scale to bitmap
         } catch (e: Exception) {
-            Log.e(tag, "渲染页面($page)错误：$e")
+            Log.e(TAG, "渲染页面($page)错误：$e")
         }
         return null
     }
@@ -156,7 +166,7 @@ class PdfCoreCore(
     @Synchronized
     private fun getEditHelper(): PdfEditHelper? {
         if (_editHelper == null) {
-            _editHelper = PdfEditHelper(file, _editCacheDir, password)
+            _editHelper = PdfEditHelper(file, editCacheDir, password)
             _editHelper?.setCoreListener(_coreListener)
         }
         return _editHelper
@@ -191,7 +201,7 @@ class PdfCoreCore(
             }
             stamper.addAnnotation(pdfAnnot, page)
         } catch (e: Exception) {
-            Log.e(tag, "添加Markup注解错误：$e")
+            Log.e(TAG, "添加Markup注解错误：$e")
         }
     }
 
@@ -214,7 +224,7 @@ class PdfCoreCore(
             }
             stamper.addAnnotation(pdfAnnot, page)
         } catch (e: Exception) {
-            Log.e(tag, "添加Ink注解错误：$e")
+            Log.e(TAG, "添加Ink注解错误：$e")
         }
     }
 }
