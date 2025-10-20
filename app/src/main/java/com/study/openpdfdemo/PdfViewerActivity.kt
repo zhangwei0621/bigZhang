@@ -14,7 +14,8 @@ import com.study.openpdfdemo.utils.toast
 import com.study.openpdfdemo.viewer.PdfCoreCore
 import com.study.openpdfdemo.viewer.data.PDFColorWrap
 import com.study.openpdfdemo.viewer.tool.PdfCoreListener
-import com.study.openpdfdemo.viewer.view.PdfViewerOverlay
+import com.study.openpdfdemo.viewer.tool.PdfOverlayListener
+import com.study.openpdfdemo.viewer.tool.TextSearchHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
@@ -55,15 +56,6 @@ class PdfViewerActivity : AppCompatActivity() {
         binding.btnNextPage.setOnClickListener {
             nextPage()
         }
-        binding.btnTestA.setOnClickListener {
-            pdfCoreCore.executeMarkupTest(
-                current,
-                PdfAnnotation.MARKUP_HIGHLIGHT,
-                PDFColorWrap(1f, 1f, 0f)
-            )
-            "A执行完成".toast(this)
-            renderCurrentPage()
-        }
         binding.btnTool.setOnClickListener {
             var next = toolStateFlow.value.ordinal + 1
             if (next >= DemoToolState.entries.size) {
@@ -82,7 +74,7 @@ class PdfViewerActivity : AppCompatActivity() {
             renderCurrentPage()
         }
         renderCurrentPage()
-        binding.demoViewer.setOverlayListener(object : PdfViewerOverlay.ActionListener {
+        binding.demoViewer.setOverlayListener(object : PdfOverlayListener {
             override fun onInkFinish(line: FloatArray) {
                 pdfCoreCore.addInk(current, line, DemoToolState.Ink.colorWrap)
                 renderCurrentPage()
@@ -135,6 +127,20 @@ class PdfViewerActivity : AppCompatActivity() {
             if (pdfCoreCore.redo()) {
                 renderCurrentPage()
             }
+        }
+        binding.btnSearch.setOnClickListener {
+            val keyword = "类"
+            val searchResult = TextSearchHelper().search(
+                pdfCoreCore.requireStructuredText(current),
+                keyword,
+                current
+            )
+            binding.demoViewer.setSearchResult(searchResult)
+            if (searchResult.isEmpty()) {
+                "啥也没找到"
+            } else {
+                "找到${searchResult.size}个结果"
+            }.toast(this)
         }
     }
 

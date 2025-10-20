@@ -45,72 +45,54 @@
             android:id="@+id/btn_refresh_page"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="刷新当前页"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="刷新当前页" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_last_page"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="上一页"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="上一页" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_next_page"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="下一页"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_test_a"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="执行测试代码A"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="下一页" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_tool"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="工具"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="工具" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="保存测试"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="保存" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_dont_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="不保存测试"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="不保存" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_undo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="撤销"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="撤销" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_redo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="重做"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="重做" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="搜索测试" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

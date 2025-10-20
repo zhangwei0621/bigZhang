@@ -15,6 +15,7 @@ import com.lowagie.text.Rectangle
 import com.study.openpdfdemo.PdfViewerActivity
 import com.study.openpdfdemo.utils.TextStripper
 import com.study.openpdfdemo.utils.isCross
+import com.study.openpdfdemo.viewer.tool.PdfOverlayListener
 import kotlin.math.abs
 
 /**
@@ -25,13 +26,11 @@ class PdfViewerOverlay(context: Context, attrs: AttributeSet?, defStyle: Int) :
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null)
 
-    private var listener: ActionListener? = null
+    private var listener: PdfOverlayListener? = null
     private val moveThreshold = 2f
     private var focusX = 0f
     private var focusY = 0f
     private var pageScale: Float = 1f
-    private var originalPageWidth: Int = 1
-    private var originalPageHeight: Int = 1
     private var currentLine = mutableListOf<PointMapper>()
     private var baseStrokeWidth = 4f
     private val inkPaint = Paint().apply {
@@ -60,13 +59,11 @@ class PdfViewerOverlay(context: Context, attrs: AttributeSet?, defStyle: Int) :
         }
     }
 
-    fun setActionListener(newListener: ActionListener?) {
+    fun setOverlayListener(newListener: PdfOverlayListener?) {
         listener = newListener
     }
 
-    fun setPageScale(originalWidth: Float, originalHeight: Float, scale: Float) {
-        originalPageWidth = originalWidth.toInt()
-        originalPageHeight = originalHeight.toInt()
+    fun setPageScale(scale: Float) {
         pageScale = scale
         calStrokeWidth()
     }
@@ -295,13 +292,5 @@ class PdfViewerOverlay(context: Context, attrs: AttributeSet?, defStyle: Int) :
             selectLines.clear()
             currentLines.clear()
         }
-    }
-
-    interface ActionListener {
-        fun onInkFinish(line: FloatArray)
-
-        fun requireStructuredText(): List<TextStripper.Line>
-
-        fun onSelectTextResult(textLines: List<TextStripper.Line>)
     }
 }
