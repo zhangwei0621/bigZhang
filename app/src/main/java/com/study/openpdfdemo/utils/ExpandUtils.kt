@@ -1,6 +1,8 @@
 package com.study.openpdfdemo.utils
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.RectF
 import android.widget.Toast
 import com.lowagie.text.Rectangle
 import java.io.ByteArrayOutputStream
@@ -75,13 +77,40 @@ fun ByteArrayOutputStream.writeToFile(destFile: File): Boolean {
 }
 
 /**
- * 判断两个矩形是否有交集。
+ * 判断两个矩形是否有交集
  */
-fun Rectangle.isCross(rect: Rectangle): Boolean {
-    val disJoin = rect.right < this.left
-            || rect.bottom > this.top
-            || rect.left > this.right
-            || rect.top < this.bottom
+fun Rectangle.isCross(target: Rectangle?): Boolean {
+    if (target == null) {
+        return false
+    }
+    val disJoin = target.right < this.left
+            || target.bottom > this.top
+            || target.left > this.right
+            || target.top < this.bottom
     return !disJoin
 }
 
+/**
+ * 判断两个矩形在Y轴方向是否具有交集
+ */
+fun Rectangle.isInYRange(target: Rectangle?): Boolean {
+    if (target == null) {
+        return false
+    }
+    val isOuterYRange = target.bottom > this.top
+            || target.top < this.bottom
+    return !isOuterYRange
+}
+
+fun Bitmap?.tryRecycle() {
+    if (this != null && !this.isRecycled) {
+        this.recycle()
+    }
+}
+
+fun RectF.isZero(): Boolean {
+    return left == 0f
+            && right == 0f
+            && top == 0f
+            && bottom == 0f
+}

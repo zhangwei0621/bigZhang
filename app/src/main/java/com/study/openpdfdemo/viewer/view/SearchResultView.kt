@@ -1,71 +1,59 @@
 package com.study.openpdfdemo.viewer.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
-import android.util.AttributeSet
 import android.view.View
 import androidx.core.graphics.toColorInt
-import com.study.openpdfdemo.viewer.data.TextSearchData
-import com.study.openpdfdemo.viewer.tool.PdfOverlayListener
+import com.study.openpdfdemo.viewer.data.PageBridge
 
 /**
  * 该控件为文档内文本搜索结果添加高光
  */
-class SearchResultView(context: Context, attrs: AttributeSet?, defStyle: Int) :
-    View(context, attrs, defStyle) {
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context) : this(context, null)
-
-    private var pageScale: Float = 1f
-    private var listener: PdfOverlayListener? = null
-    private val searchResult = mutableListOf<TextSearchData>()
+@SuppressLint("ViewConstructor")
+class SearchResultView(
+    context: Context,
+    private val _pageBridge: PageBridge,
+    private val overlayInterface: ResultOverlayInterface
+) : View(context) {
+    private val selectedColor = "#99EE2F2E".toColorInt()
+    private val unselectedColor = "#4D159B53".toColorInt()
     private val paint = Paint().apply {
         isAntiAlias = true
         isDither = true
         style = Paint.Style.FILL
-        color = "#99EE2F2E".toColorInt()
     }
     private val path = Path()
 
-    fun setPageScale(scale: Float) {
-        pageScale = scale
-    }
-
-    fun setOverlayListener(newListener: PdfOverlayListener?) {
-        listener = newListener
-    }
-
-    /**
-     * 传入搜索结果，渲染搜索高光效果
-     */
-    fun setSearchResult(result: List<TextSearchData>) {
-        searchResult.clear()
-        searchResult.addAll(result)
-        invalidate()
-    }
-
-    /**
-     * 清除搜索结果和高光效果
-     */
-    fun clear() {
-        searchResult.clear()
-        invalidate()
-    }
-
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        searchResult.forEach { data ->
-            path.reset()
-            val lb = data.getAndroidLBPoint(pageScale)
-            val rt = data.getAndroidRTPoint(pageScale)
-            path.moveTo(lb.x, lb.y)
-            path.lineTo(rt.x, lb.y)
-            path.lineTo(rt.x, rt.y)
-            path.lineTo(lb.x, rt.y)
-            path.close()
-            canvas.drawPath(path, paint)
+        val pageIndex = overlayInterface.getPage()
+        val fitScale = overlayInterface.getFitScale()
+        _pageBridge.searchResult?.let { searchResult ->
+            searchResult.getPageResult(pageIndex)?.forEachIndexed { index, data ->
+                path.reset()
+                val lb = data.lbPoint.newScaled(fitScale)
+                val rt = data.rtPoint.newScaled(fitScale)
+                path.moveTo(lb.sx, lb.sy)
+                path.lineTo(rt.sx, lb.sy)
+                path.lineTo(rt.sx, rt.sy)
+                path.lineTo(lb.sx, rt.sy)
+                path.close()
+                if (pageIndex == searchResult.selectedPage && index == searchResult.selectedIndex) {
+                    paint.color = selectedColor
+                } else {
+                    paint.color = unselectedColor
+                }
+                canvas.drawPath(path, paint)
+            }
         }
+    }
+
+    interface ResultOverlayInterface {
+        fun getPage(): Int
+
+        fun getFitScale(): Float
     }
 }

@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @param cacheDir 工作缓存目录
  * @param password 密码。如果文件有加密，需要密码才能编辑。编辑过程中的文件是没用加密的。如果该参数不为空字符串，保存时才会将密码重新写入到输出文件中。
  */
+// TODO: 线程优化
 class PdfEditHelper(
     private val file: File,
     private val cacheDir: File,

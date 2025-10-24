@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaScannerConnection
 import android.net.Uri
 import java.io.File
+import java.io.FileOutputStream
 
 /**
  * author ZhangWei
@@ -24,5 +25,17 @@ object Tools {
         ) { _: String?, _: Uri? ->
 
         }
+    }
+
+    fun copyPdfFromAssets(context: Context, assetName: String, forceOverwrite: Boolean): File {
+        val file = File(context.cacheDir, assetName)
+        if (!file.exists() || file.length() <= 0L || forceOverwrite) {
+            context.assets.open(assetName).use { input ->
+                FileOutputStream(file).use { output ->
+                    input.copyTo(output)
+                }
+            }
+        }
+        return file
     }
 }

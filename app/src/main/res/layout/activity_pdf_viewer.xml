@@ -5,10 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.study.openpdfdemo.viewer.view.DemoViewer
-        android:id="@+id/demo_viewer"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:gravity="center">
+
+        <com.study.openpdfdemo.viewer.view.PdfView
+            android:id="@+id/pdf_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_path"
@@ -94,5 +102,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="搜索测试" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_search_last"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="搜索:↑" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_search_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="搜索:↓" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

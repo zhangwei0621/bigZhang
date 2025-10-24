@@ -1,7 +1,7 @@
 package com.study.openpdfdemo.viewer.tool
 
-import com.study.openpdfdemo.viewer.tool.TextStripper
 import com.study.openpdfdemo.viewer.data.TextSearchData
+import com.study.openpdfdemo.viewer.text.extractor.data.WordLine
 
 /**
  * PDF文档内文本搜索工具
@@ -11,9 +11,8 @@ class TextSearchHelper {
      * 执行搜索
      * @param lines 结构化文本行
      * @param keyword 关键字
-     * @param page 当前页码，后续全文档搜索可能需要
      */
-    fun search(lines: List<TextStripper.Line>, keyword: String, page: Int): List<TextSearchData> {
+    fun search(lines: List<WordLine>, keyword: String): List<TextSearchData> {
         val result = mutableListOf<TextSearchData>()
         if (lines.isEmpty() || keyword.isBlank()) {
             return result
@@ -29,11 +28,10 @@ class TextSearchHelper {
                 }
                 val start = foundIndex
                 val end = start + keyword.length - 1
-                val spans = line.spans
+                val spans = line.wordSpans
                 val startSpan = spans[start]
                 val endSpan = spans[end]
-                result +=
-                    TextSearchData(page, startSpan.leftBottomPoint, endSpan.rightTopPoint)
+                result += TextSearchData(startSpan.lbPoint, endSpan.rtPoint)
                 currentIndex = foundIndex + 1
             }
         }
