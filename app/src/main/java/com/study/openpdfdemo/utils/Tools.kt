@@ -3,6 +3,8 @@ package com.study.openpdfdemo.utils
 import android.content.Context
 import android.media.MediaScannerConnection
 import android.net.Uri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
@@ -27,7 +29,9 @@ object Tools {
         }
     }
 
-    fun copyPdfFromAssets(context: Context, assetName: String, forceOverwrite: Boolean): File {
+    suspend fun copyPdfFromAssets(
+        context: Context, assetName: String, forceOverwrite: Boolean
+    ): File = withContext(Dispatchers.IO) {
         val file = File(context.cacheDir, assetName)
         if (!file.exists() || file.length() <= 0L || forceOverwrite) {
             context.assets.open(assetName).use { input ->
@@ -36,6 +40,6 @@ object Tools {
                 }
             }
         }
-        return file
+        return@withContext file
     }
 }

@@ -41,9 +41,9 @@ class PdfViewerActivity : AppCompatActivity() {
         initView()
     }
 
-    private fun initView() {
-        val file = copyPdfFromAssets(this, testAsset, false)
-        if (!file.exists()) return
+    private fun initView() = lifecycleScope.launch {
+        val file = copyPdfFromAssets(this@PdfViewerActivity, testAsset, false)
+        if (!file.exists()) return@launch
         binding.tvPath.text = file.absolutePath
         binding.pdfView.setCoreListener(object : PdfView.PdfViewInterface {
             override fun onRedoUndoStateChanged(canUndo: Boolean, canRedo: Boolean) {
@@ -120,7 +120,7 @@ class PdfViewerActivity : AppCompatActivity() {
                 "搜索到文本"
             } else {
                 "啥也没找到"
-            }.toast(this)
+            }.toast()
         }
         binding.btnSearch.setOnLongClickListener {
             binding.pdfView.clearSearchResult()
@@ -135,12 +135,12 @@ class PdfViewerActivity : AppCompatActivity() {
         }
         binding.btnSearchLast.setOnClickListener {
             if (!binding.pdfView.nextSearchResult(SearchDirection.BACKWARD)) {
-                "没有了".toast(this)
+                "没有了".toast()
             }
         }
         binding.btnSearchNext.setOnClickListener {
             if (!binding.pdfView.nextSearchResult(SearchDirection.FORWARD)) {
-                "没有了".toast(this)
+                "没有了".toast()
             }
         }
     }

@@ -3,29 +3,25 @@ package com.study.openpdfdemo.viewer
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
-import android.graphics.RectF
-import android.os.ParcelFileDescriptor
 import android.util.Log
 import com.lowagie.text.Rectangle
 import com.lowagie.text.pdf.PdfAnnotation
 import com.lowagie.text.pdf.PdfArray
 import com.lowagie.text.pdf.PdfBorderArray
 import com.lowagie.text.pdf.PdfName
-import com.lowagie.text.pdf.PdfReader
 import com.lowagie.text.pdf.PdfStamper
+import com.study.openpdfdemo.core.IReader
+import com.study.openpdfdemo.core.PageRect
+import com.study.openpdfdemo.core.RenderOption
+import com.study.openpdfdemo.core.pdfium.PdfiumReader
 import com.study.openpdfdemo.utils.toQuad
 import com.study.openpdfdemo.viewer.data.PDFAnnot
 import com.study.openpdfdemo.viewer.data.PDFColorWrap
 import com.study.openpdfdemo.viewer.data.TextSearchResult
-import com.study.openpdfdemo.viewer.text.extractor.PdfboxTextExtractor
-import com.study.openpdfdemo.viewer.text.extractor.PdfiumTextExtractor
 import com.study.openpdfdemo.viewer.text.extractor.data.WordLine
 import com.study.openpdfdemo.viewer.tool.PdfCoreListener
 import com.study.openpdfdemo.viewer.tool.PdfEditHelper
 import com.study.openpdfdemo.viewer.tool.TextSearchHelper
-import com.tom_roush.pdfbox.pdmodel.PDDocument
-import io.legere.pdfiumandroid.PdfDocument
-import io.legere.pdfiumandroid.PdfiumCore
 import java.io.File
 
 /**
@@ -55,22 +51,20 @@ class PdfCore(
         }
     }
 
-    // TODO: 对文件大小有限制 大文件会OOM
-    private var _pdfReader: PdfReader = PdfReader(file.absolutePath, password.toByteArray())
-    private val _fd = ParcelFileDescriptor(
-        ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
-    )
+    private var _pdfReader: IReader = PdfiumReader().apply {
+        Log.d(TAG, "Using Reader")
+        load(file, password)
+        Log.d(TAG, "Reader Load Finish")
+    }
     private var _editHelper: PdfEditHelper? = null
-    private val _pdfiumCore: PdfiumCore = PdfiumCore()
-    private val _pdfiumDoc: PdfDocument = _pdfiumCore.newDocument(_fd, password)
-    private val _pdfboxDoc: PDDocument = PDDocument.load(file, password)
     private var _coreListener: PdfCoreListener? = null
 
     var pageCount: Int = 0
         private set
 
     init {
-        pageCount = _pdfReader.numberOfPages
+        pageCount = _pdfReader.pageCount
+        Log.d(TAG, "Page Count: $pageCount")
     }
 
     /**
@@ -79,9 +73,6 @@ class PdfCore(
     fun destroy() = runCatching {
         _pdfReader.close()
         _editHelper?.destroy()
-        _fd.close()
-        _pdfiumDoc.close()
-        _pdfboxDoc.close()
     }
 
     /**
@@ -89,13 +80,11 @@ class PdfCore(
      * @return 以行形式的数据合集
      */
     fun getText(pageIndex: Int): List<WordLine> {
-        //return PdfboxTextExtractor().extract(_pdfboxDoc, pageIndex + 1)
-        return PdfiumTextExtractor().extract(_pdfiumDoc, pageIndex)
+        return _pdfReader.createTextExtractor().extract(pageIndex)
     }
 
     fun search(keyword: String): TextSearchResult {
-        //return pdfboxSearchImpl(keyword)
-        return pdfiumSearchImpl(keyword)
+        return searchTextImpl(keyword)
     }
 
     /**
@@ -133,7 +122,7 @@ class PdfCore(
     /**
      * 获取页面原始尺寸
      */
-    fun getPageSize(pageIndex: Int): Rectangle {
+    fun getPageSize(pageIndex: Int): PageRect {
         return _pdfReader.getPageSize(pageIndex + 1)
     }
 
@@ -148,22 +137,7 @@ class PdfCore(
         try {
             val start = System.currentTimeMillis()
             val targetFile = _editHelper?.getPreviewFile() ?: file
-            val fd = ParcelFileDescriptor(
-                ParcelFileDescriptor.open(targetFile, ParcelFileDescriptor.MODE_READ_ONLY)
-            )
-            val doc = _pdfiumCore.newDocument(fd, password)
-            val pdfPage = doc.openPage(pageIndex)
-            pdfPage.renderPageBitmap(
-                output,
-                0,
-                0,
-                output.width,
-                output.height,
-                renderAnnot
-            )
-            fd.close()
-            pdfPage.close()
-            doc.close()
+            _pdfReader.renderPage(targetFile, pageIndex, output, RenderOption(renderAnnot))
             val end = System.currentTimeMillis()
             Log.d(TAG, "render page $pageIndex : ${(end - start) / 1000f}")
         } catch (e: Exception) {
@@ -186,23 +160,13 @@ class PdfCore(
         try {
             val start = System.currentTimeMillis()
             val targetFile = _editHelper?.getPreviewFile() ?: file
-            val fd = ParcelFileDescriptor(
-                ParcelFileDescriptor.open(targetFile, ParcelFileDescriptor.MODE_READ_ONLY)
-            )
-            val doc = _pdfiumCore.newDocument(fd, password)
-            val pdfPage = doc.openPage(pageIndex)
-            pdfPage.renderPageBitmap(
-                output,
-                Matrix().apply {
+            _pdfReader.renderPage(
+                targetFile, pageIndex, output,
+                RenderOption(renderAnnot, matrix = Matrix().apply {
                     postScale(scale, scale)
                     postTranslate(-startX, -startY)
-                },
-                RectF(0f, 0f, output.width.toFloat(), output.height.toFloat()),
-                renderAnnot
+                })
             )
-            fd.close()
-            pdfPage.close()
-            doc.close()
             val end = System.currentTimeMillis()
             if (pageIndex == 1) {
                 Log.d(TAG, "tiled render page $pageIndex : ${(end - start) / 1000f}")
@@ -221,7 +185,7 @@ class PdfCore(
             val page = pageIndex + 1
             val rect = _pdfReader.getPageSize(page)
             val annotWrap = PDFAnnot.InkAnnotWrap(
-                rect,
+                Rectangle(rect.width, rect.height),
                 color,
                 4f,
                 line
@@ -258,36 +222,14 @@ class PdfCore(
     }
 
     //全文搜索
-    private fun pdfboxSearchImpl(keyword: String): TextSearchResult {
+    private fun searchTextImpl(keyword: String): TextSearchResult {
         val start = System.currentTimeMillis()
         val result = TextSearchResult()
         if (keyword.isNotEmpty()) {
             val searchHelper = TextSearchHelper()
-            val extractor = PdfboxTextExtractor()
+            val extractor = _pdfReader.createTextExtractor()
             repeat(pageCount) { pageIndex ->
-                val page = pageIndex + 1
-                val textLines = extractor.extract(_pdfboxDoc, page)
-                val searchData = searchHelper.search(textLines, keyword)
-                if (searchData.isNotEmpty()) {
-                    result.pageList.add(pageIndex)
-                    result.searchDataList.add(searchData)
-                }
-            }
-        }
-        val end = System.currentTimeMillis()
-        Log.d(TAG, "pdfbox search time：${(end - start) / 1000f}")
-        return result
-    }
-
-    //全文搜索
-    private fun pdfiumSearchImpl(keyword: String): TextSearchResult {
-        val start = System.currentTimeMillis()
-        val result = TextSearchResult()
-        if (keyword.isNotEmpty()) {
-            val searchHelper = TextSearchHelper()
-            val extractor = PdfiumTextExtractor()
-            repeat(pageCount) { pageIndex ->
-                val textLines = extractor.extract(_pdfiumDoc, pageIndex)
+                val textLines = extractor.extract(pageIndex)
                 val searchData = searchHelper.search(textLines, keyword)
                 if (searchData.isNotEmpty()) {
                     result.pageList.add(pageIndex)

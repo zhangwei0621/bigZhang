@@ -20,7 +20,8 @@ fun Rectangle.toQuad() = floatArrayOf(
     right, bottom,//右下
 )
 
-fun String.toast(ctx: Context) {
+context(ctx: Context)
+fun String.toast() {
     Toast.makeText(ctx, this, Toast.LENGTH_SHORT).show()
 }
 
