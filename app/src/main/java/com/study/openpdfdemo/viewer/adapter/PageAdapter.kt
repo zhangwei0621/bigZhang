@@ -36,7 +36,7 @@ class PageAdapter(
         }
         pageView.openPage(position)
         pageView.enablePageOverlay = enablePageOverlay
-        onFitScaleChanged(pageView.currentFitScale)
+        pageView.onFitScaleChanged = onFitScaleChanged
         return pageView
     }
 }

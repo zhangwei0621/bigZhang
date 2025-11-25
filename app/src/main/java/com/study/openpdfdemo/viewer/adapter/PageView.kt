@@ -57,6 +57,7 @@ class PageView(
     private var _pageIndex: Int = -1
     private var _contentBitmap: Bitmap? = null
     private var _hqContentBitmap: Bitmap? = null
+    var onFitScaleChanged: ((Float) -> Unit)? = null
 
     /**
      * channel串行执行渲染和销毁工作，以免渲染和销毁可能同步进行导致bitmap回收错误。
@@ -69,11 +70,6 @@ class PageView(
     private var _hqViewHeight: Int = 0
     private var _hqViewRect: Rect? = Rect()
     private val _hqScaleThreshold = 0.01f
-    val currentFitScale: Float
-        get() {
-            calculateFitScale()
-            return _fitScale
-        }
     var enablePageOverlay
         get() = _overlayView.enable
         set(value) {
@@ -281,6 +277,7 @@ class PageView(
                 _pageBridge.readerHeight * 1f / _pdfHeight
             )
         }
+        onFitScaleChanged?.invoke(_fitScale)
     }
 
     private fun showOverlayView() {
