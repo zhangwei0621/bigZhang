@@ -10,7 +10,9 @@ import com.study.openpdfdemo.viewer.data.PageBridge
 class PageAdapter(
     private val context: Context,
     private val pdfCore: PdfCore,
-    private var pageBridge: PageBridge
+    private var pageBridge: PageBridge,
+    private val enablePageOverlay: Boolean,
+    private val onFitScaleChanged: (Float) -> Unit
 ) : BaseAdapter() {
     override fun getCount(): Int = pdfCore.pageCount
 
@@ -33,6 +35,8 @@ class PageAdapter(
             )
         }
         pageView.openPage(position)
+        pageView.enablePageOverlay = enablePageOverlay
+        onFitScaleChanged(pageView.currentFitScale)
         return pageView
     }
 }

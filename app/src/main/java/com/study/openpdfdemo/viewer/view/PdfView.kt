@@ -8,9 +8,8 @@ import com.study.openpdfdemo.viewer.adapter.PageAdapter
 import com.study.openpdfdemo.viewer.data.PageTool
 import com.study.openpdfdemo.viewer.data.SearchDirection
 import com.study.openpdfdemo.viewer.tool.PdfCoreListener
+import com.study.openpdfdemo.viewer.view.op.HeavyOperator
 import com.study.openpdfdemo.viewer.view.reader.PdfReaderView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 
 class PdfView(context: Context, attrs: AttributeSet?, defStyle: Int) :
@@ -21,6 +20,7 @@ class PdfView(context: Context, attrs: AttributeSet?, defStyle: Int) :
     private var _pdfCore: PdfCore? = null
     private var _pdfReaderView: PdfReaderView? = null
     private var _listener: PdfViewInterface? = null
+    private val _pdfOperator = HeavyOperator(context, { _pdfReaderView })
 
     fun setCoreListener(listener: PdfViewInterface?) {
         _listener = listener
@@ -30,11 +30,7 @@ class PdfView(context: Context, attrs: AttributeSet?, defStyle: Int) :
      * 建议先设置[setCoreListener]再调用本方法，否则有些初始化的数据可能无法传出
      */
     suspend fun openFile(file: File, password: String = "") {
-        _pdfCore = withContext(Dispatchers.Default) {
-            // TODO: 核心工具使用多种不同的PDF库，导致构造时很卡，界面可以考虑做个loading动画
-            PdfCore(file, PdfCore.getCacheDir(context), password)
-        }
-        _pdfCore?.setCoreListener(object : PdfCoreListener {
+        val pdfCore = _pdfOperator.initCore(file, password, object : PdfCoreListener {
             override fun onRedoUndoStateChanged(canUndo: Boolean, canRedo: Boolean) {
                 _listener?.onRedoUndoStateChanged(canUndo, canRedo)
             }
@@ -43,8 +39,17 @@ class PdfView(context: Context, attrs: AttributeSet?, defStyle: Int) :
                 _listener?.onSaveStateChanged(needSave)
             }
         })
+        _pdfCore = pdfCore
         _pdfReaderView = PdfReaderView(context).also { pdfReaderView ->
-            pdfReaderView.adapter = PageAdapter(context, _pdfCore!!, pdfReaderView.pageBridge)
+            pdfReaderView.adapter = PageAdapter(
+                context,
+                _pdfCore!!,
+                pdfReaderView.pageBridge,
+                onFitScaleChanged = { fitScale ->
+                    _pdfOperator.fitScale = fitScale
+                },
+                enablePageOverlay = _pdfOperator.enablePageOverlay
+            )
             pdfReaderView.setListener(object : PdfReaderView.PdfReaderViewInterface {
                 override fun onDisplayPageChanged(pageIndex: Int, total: Int) {
                     _listener?.onDisplayPageChanged(pageIndex, total)
@@ -53,6 +58,7 @@ class PdfView(context: Context, attrs: AttributeSet?, defStyle: Int) :
             this.removeAllViews()
             this.addView(pdfReaderView)
         }
+        _pdfOperator.attachToPdfView(this)
     }
 
     fun nextPage() {
@@ -80,23 +86,19 @@ class PdfView(context: Context, attrs: AttributeSet?, defStyle: Int) :
     }
 
     fun save() {
-        _pdfCore?.save()
+        _pdfOperator.save()
     }
 
     fun abandonSave() {
-        _pdfCore?.abandonSave()
+        _pdfOperator.abandonSave()
     }
 
     fun undo() {
-        if (_pdfCore?.undo() == true) {
-            _pdfReaderView?.redraw()
-        }
+        _pdfOperator.undo()
     }
 
     fun redo() {
-        if (_pdfCore?.redo() == true) {
-            _pdfReaderView?.redraw()
-        }
+        _pdfOperator.redo()
     }
 
     fun search(keyword: String): Boolean {
@@ -148,9 +150,7 @@ class PdfView(context: Context, attrs: AttributeSet?, defStyle: Int) :
     /**
      * PdfView对外接口。实现方建议做线程检查，以免在子线程上处理UI
      */
-    interface PdfViewInterface {
-        fun onRedoUndoStateChanged(canUndo: Boolean, canRedo: Boolean)
-        fun onSaveStateChanged(needSave: Boolean)
+    interface PdfViewInterface : PdfCoreListener {
         fun onDisplayPageChanged(pageIndex: Int, total: Int)
     }
 }

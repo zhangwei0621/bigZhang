@@ -6,13 +6,11 @@ import android.graphics.Matrix
 import android.util.Log
 import com.lowagie.text.Rectangle
 import com.lowagie.text.pdf.PdfAnnotation
-import com.lowagie.text.pdf.PdfArray
-import com.lowagie.text.pdf.PdfBorderArray
-import com.lowagie.text.pdf.PdfName
-import com.lowagie.text.pdf.PdfStamper
+import com.study.openpdfdemo.core.IPdfEditor
 import com.study.openpdfdemo.core.IReader
 import com.study.openpdfdemo.core.PageRect
 import com.study.openpdfdemo.core.RenderOption
+import com.study.openpdfdemo.core.pdfbox.PDFBoxEditor
 import com.study.openpdfdemo.core.pdfium.PdfiumReader
 import com.study.openpdfdemo.utils.toQuad
 import com.study.openpdfdemo.viewer.data.PDFAnnot
@@ -22,6 +20,9 @@ import com.study.openpdfdemo.viewer.text.extractor.data.WordLine
 import com.study.openpdfdemo.viewer.tool.PdfCoreListener
 import com.study.openpdfdemo.viewer.tool.PdfEditHelper
 import com.study.openpdfdemo.viewer.tool.TextSearchHelper
+import com.study.openpdfdemo.viewer.view.EditOps
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -38,6 +39,8 @@ import java.io.File
 class PdfCore(
     val file: File,
     private val editCacheDir: File,
+    context: Context,
+    private val buildPreviewFile: Boolean,
     val password: String = ""
 ) {
     companion object {
@@ -56,6 +59,7 @@ class PdfCore(
         load(file, password)
         Log.d(TAG, "Reader Load Finish")
     }
+    private val _pdfEditor: IPdfEditor = PDFBoxEditor(context)
     private var _editHelper: PdfEditHelper? = null
     private var _coreListener: PdfCoreListener? = null
 
@@ -112,6 +116,10 @@ class PdfCore(
         _editHelper?.executeSaveOperation()
     }
 
+    fun save(page: Int, ops: List<EditOps>) {
+        saveAnnotations(page, ops)
+    }
+
     /**
      * 抛弃编辑操作
      */
@@ -141,6 +149,7 @@ class PdfCore(
             val end = System.currentTimeMillis()
             Log.d(TAG, "render page $pageIndex : ${(end - start) / 1000f}")
         } catch (e: Exception) {
+            e.printStackTrace()
             Log.e(TAG, "渲染页面($pageIndex)错误：$e")
         }
     }
@@ -180,7 +189,9 @@ class PdfCore(
      * 添加Ink注解
      * @param pageIndex 0-base
      */
-    fun addInk(pageIndex: Int, line: FloatArray, color: PDFColorWrap) {
+    suspend fun addInk(
+        pageIndex: Int, line: FloatArray, color: PDFColorWrap
+    ) = withContext(Dispatchers.IO) {
         getEditHelper()?.executeStamperOperation { stamper ->
             val page = pageIndex + 1
             val rect = _pdfReader.getPageSize(page)
@@ -190,7 +201,7 @@ class PdfCore(
                 4f,
                 line
             )
-            addInkAnnotation(page, annotWrap, stamper)
+            stamper.addInkAnno(page, annotWrap, pageCount)
         }
     }
 
@@ -215,7 +226,40 @@ class PdfCore(
                         color,
                         rect.toQuad()
                     )
-                    addMarkupAnnotation(page, annotWrap, stamper)
+                    stamper.addMarkupAnno(page, annotWrap, pageCount)
+                }
+            }
+        }
+    }
+
+    fun saveAnnotations(page: Int, annotations: List<EditOps>) {
+        getEditHelper()?.saveOperation { stamper ->
+            val rect = _pdfReader.getPageSize(page)
+            for (op in annotations) {
+                when (op) {
+                    is EditOps.HighLight -> {
+                        op.lines.forEach { line ->
+                            val rect = line.getLineRectForPdf()
+                            if (rect != null) {
+                                val annotWrap = PDFAnnot.MarkupAnnotWrap(
+                                    rect,
+                                    PdfAnnotation.MARKUP_HIGHLIGHT,
+                                    PDFColorWrap(1f, 1f, 0f),
+                                    rect.toQuad()
+                                )
+                                stamper.addMarkupAnno(page, annotWrap, pageCount)
+                            }
+                        }
+                    }
+                    is EditOps.Ink -> {
+                        val annotWrap = PDFAnnot.InkAnnotWrap(
+                            Rectangle(rect.width, rect.height),
+                            PDFColorWrap(1f, 0f, 0f),
+                            4f,
+                            op.toPdfLines()
+                        )
+                        stamper.addInkAnno(page, annotWrap, pageCount)
+                    }
                 }
             }
         }
@@ -245,65 +289,11 @@ class PdfCore(
     @Synchronized
     private fun getEditHelper(): PdfEditHelper? {
         if (_editHelper == null) {
-            _editHelper = PdfEditHelper(file, editCacheDir, password)
+            _editHelper = PdfEditHelper(file, editCacheDir, password, _pdfEditor,
+                buildPreviewFile = buildPreviewFile)
             _editHelper?.setCoreListener(_coreListener)
         }
         return _editHelper
     }
 
-    private fun addMarkupAnnotation(
-        page: Int,
-        annot: PDFAnnot.MarkupAnnotWrap,
-        stamper: PdfStamper
-    ) {
-        try {
-            if (page <= 0 || page > pageCount) {
-                throw Exception("页码($page)超出范围")
-            }
-            if (annot.markupType != PdfAnnotation.MARKUP_HIGHLIGHT
-                && annot.markupType != PdfAnnotation.MARKUP_UNDERLINE
-                && annot.markupType != PdfAnnotation.MARKUP_STRIKEOUT
-            ) {
-                throw Exception("Markup类型(${annot.markupType})错误")
-            }
-            if (annot.quadPoints.isEmpty()) {
-                throw Exception("Quad数组为空")
-            }
-            val pdfAnnot = PdfAnnotation.createMarkup(
-                stamper.writer,
-                annot.rect,
-                "",
-                annot.markupType,
-                annot.quadPoints
-            ).apply {
-                put(PdfName.C, PdfArray(annot.color.asFloatArray()))
-            }
-            stamper.addAnnotation(pdfAnnot, page)
-        } catch (e: Exception) {
-            Log.e(TAG, "添加Markup注解错误：$e")
-        }
-    }
-
-    private fun addInkAnnotation(page: Int, annot: PDFAnnot.InkAnnotWrap, stamper: PdfStamper) {
-        try {
-            if (page <= 0 || page > pageCount) {
-                throw Exception("页码($page)超出范围")
-            }
-            if (annot.line.isEmpty()) {
-                throw Exception("Line为空")
-            }
-            val pdfAnnot = PdfAnnotation.createInk(
-                stamper.writer,
-                annot.rect,
-                "",
-                arrayOf(annot.line)
-            ).apply {
-                put(PdfName.C, PdfArray(annot.color.asFloatArray()))
-                setBorder(PdfBorderArray(10f, 10f, annot.autoStrokeWidth()))
-            }
-            stamper.addAnnotation(pdfAnnot, page)
-        } catch (e: Exception) {
-            Log.e(TAG, "添加Ink注解错误：$e")
-        }
-    }
 }

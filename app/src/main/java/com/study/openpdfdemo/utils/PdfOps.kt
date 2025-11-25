@@ -6,8 +6,8 @@ import com.lowagie.text.Document
 import com.lowagie.text.exceptions.BadPasswordException
 import com.lowagie.text.pdf.PdfCopy
 import com.lowagie.text.pdf.PdfReader
-import com.lowagie.text.pdf.PdfStamper
-import com.lowagie.text.pdf.PdfWriter
+import com.study.openpdfdemo.core.IPdfEditor
+import com.study.openpdfdemo.core.openpdf.OpenPdfEditor
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -18,6 +18,7 @@ import java.io.FileOutputStream
  */
 object PdfOps {
     const val TAG = "PdfOps"
+    private val _editor: IPdfEditor = OpenPdfEditor()
 
     /**
      * 读取已有 PDF → 导出为加密的新文件
@@ -25,16 +26,7 @@ object PdfOps {
     fun encryptPdfPlace(context: Context, inputFile: File, pwd: String) {
         runCatching {
             val tmp = File(inputFile.parentFile, "${inputFile.nameWithoutExtension}_enc.pdf")
-            PdfReader(FileInputStream(inputFile)).use { reader ->
-                PdfStamper(reader, FileOutputStream(tmp)).use { stamper ->
-                    stamper.setEncryption(
-                        pwd.toByteArray(),
-                        pwd.toByteArray(),
-                        PdfWriter.ALLOW_PRINTING or PdfWriter.ALLOW_COPY,
-                        PdfWriter.ENCRYPTION_AES_128
-                    )
-                }
-            }
+            _editor.encrypt(FileInputStream(inputFile), pwd, FileOutputStream(tmp))
             if (!inputFile.delete() || !tmp.renameTo(inputFile)) {
                 tmp.delete()
             }
@@ -52,9 +44,7 @@ object PdfOps {
     fun decryptPdfReplace(context: Context, inputFile: File, pwd: String) {
         runCatching {
             val tmp = File(inputFile.parentFile, "${inputFile.nameWithoutExtension}_dec.pdf")
-            PdfReader(FileInputStream(inputFile), pwd.toByteArray()).use { reader ->
-                PdfStamper(reader, FileOutputStream(tmp)).use { }
-            }
+            _editor.decrypt(inputFile, pwd, FileOutputStream(tmp))
             if (!inputFile.delete() || !tmp.renameTo(inputFile)) {
                 tmp.delete()
             }
@@ -69,18 +59,7 @@ object PdfOps {
      * 判断是否加密
      */
     fun isEncrypted(file: File): Boolean {
-        return try {
-            val reader = PdfReader(FileInputStream(file))
-            val encrypted = reader.isEncrypted
-            reader.close()
-            encrypted
-        } catch (_: BadPasswordException) {
-            // 文件确实被加密，只是没提供密码
-            true
-        } catch (_: Exception) {
-            // 其他错误，不认为是加密（可能是损坏）
-            false
-        }
+        return _editor.isEncrypted(file)
     }
 
     /**
@@ -103,19 +82,8 @@ object PdfOps {
         inputs: List<File>,
         output: File,
     ) = runCatching {
-        val doc = Document()
         FileOutputStream(output).use { fos ->
-            val copy = PdfCopy(doc, fos)
-            doc.open()
-            inputs.forEach { f ->
-                PdfReader(FileInputStream(f)).use { r ->
-                    for (i in 1..r.numberOfPages) {
-                        val page = copy.getImportedPage(r, i)
-                        copy.addPage(page)
-                    }
-                }
-            }
-            doc.close()
+            _editor.merge(inputs, fos)
         }
         Log.i(TAG, "合并成功")
         Tools.refreshMedia(context, output)

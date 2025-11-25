@@ -20,7 +20,9 @@ import com.study.openpdfdemo.viewer.data.PageTool
 import com.study.openpdfdemo.viewer.text.extractor.data.WordLine
 import com.study.openpdfdemo.viewer.view.PdfViewerOverlay
 import com.study.openpdfdemo.viewer.view.SearchResultView
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
 import kotlin.math.min
@@ -31,6 +33,7 @@ class PageView(
     private val _pdfCore: PdfCore,
     private val _pageBridge: PageBridge,
 ) : ViewGroup(_context) {
+    private val uiScope = CoroutineScope(Dispatchers.Main)
     private val _contentView = AppCompatImageView(_context)
     private val _hqContentView = AppCompatImageView(_context)
     private val _overlayView =
@@ -66,6 +69,16 @@ class PageView(
     private var _hqViewHeight: Int = 0
     private var _hqViewRect: Rect? = Rect()
     private val _hqScaleThreshold = 0.01f
+    val currentFitScale: Float
+        get() {
+            calculateFitScale()
+            return _fitScale
+        }
+    var enablePageOverlay
+        get() = _overlayView.enable
+        set(value) {
+            _overlayView.enable = value
+        }
 
     init {
         _overlayView.visibility = GONE
@@ -333,10 +346,11 @@ class PageView(
         return object : PdfViewerOverlay.OverlayInterface {
             override fun onInkFinish(line: FloatArray) {
                 if (_pageIndex >= 0) {
-                    _pdfCore.addInk(_pageIndex, line, PDFColorWrap(1f, 0f, 0f))
-                    redrawPage()
-                    checkHqDraw(true) {
-                        _overlayView.invalidate()
+                    uiScope.launch {
+                        _pdfCore.addInk(_pageIndex, line, PDFColorWrap(1f, 0f, 0f))
+                        redrawPage {
+                            _overlayView.invalidate()
+                        }
                     }
                 }
             }

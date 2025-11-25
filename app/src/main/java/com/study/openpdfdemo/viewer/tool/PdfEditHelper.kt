@@ -1,8 +1,7 @@
 package com.study.openpdfdemo.viewer.tool
 
-import com.lowagie.text.pdf.PdfReader
-import com.lowagie.text.pdf.PdfStamper
-import com.lowagie.text.pdf.PdfWriter
+import com.study.openpdfdemo.core.IEditWorkHandler
+import com.study.openpdfdemo.core.IPdfEditor
 import com.study.openpdfdemo.utils.copyAsByteArrayOS
 import com.study.openpdfdemo.utils.copyTo
 import com.study.openpdfdemo.utils.writeToFile
@@ -22,7 +21,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 class PdfEditHelper(
     private val file: File,
     private val cacheDir: File,
-    private val password: String = ""
+    private val password: String = "",
+    private val pdfEditor: IPdfEditor,
+    private val buildPreviewFile: Boolean
 ) {
     //预览文件，暂存操作效果到该文件
     private var previewFile: File? = null
@@ -56,16 +57,10 @@ class PdfEditHelper(
     /**
      * 执行Stamper编辑操作，此方法执行的编辑操作将记录为一次操作并记入操作栈
      */
-    fun executeStamperOperation(working: (PdfStamper) -> Unit) {
+    fun executeStamperOperation(working: (IEditWorkHandler) -> Unit) {
         previewFile?.let { previewFile ->
-            val reader = PdfReader(previewFile.absolutePath, password.toByteArray())
             val outputStream = ByteArrayOutputStream()
-            val stamper = PdfStamper(reader, outputStream)
-            //执行编辑工作
-            stamper.let { working.invoke(it) }
-            //关闭写入，数据开始写入到outputStream
-            stamper.close()
-            reader.close()
+            pdfEditor.shortWork(previewFile, password, outputStream, working)
             outputStream.writeToFile(previewFile)
             operationStack.add(outputStream)
             _needSave.set(true)
@@ -77,6 +72,12 @@ class PdfEditHelper(
         }
     }
 
+    fun saveOperation(working: (IEditWorkHandler) -> Unit) {
+        val outputStream = ByteArrayOutputStream()
+        pdfEditor.shortWork(file, password, outputStream, working)
+        outputStream.writeToFile(file)
+    }
+
     /**
      * 将编辑结果保存到原文件中
      */
@@ -86,17 +87,8 @@ class PdfEditHelper(
                 //写到正式文件中
                 if (password.isNotEmpty()) {
                     FileInputStream(previewFile).use { fis ->
-                        PdfReader(fis, password.toByteArray()).use { reader ->
-                            FileOutputStream(file).use { fos ->
-                                PdfStamper(reader, fos).use { stamper ->
-                                    stamper.setEncryption(
-                                        password.toByteArray(),
-                                        password.toByteArray(),
-                                        PdfWriter.ALLOW_COPY or PdfWriter.ALLOW_COPY,
-                                        PdfWriter.ENCRYPTION_AES_128
-                                    )
-                                }
-                            }
+                        FileOutputStream(file).use { fos ->
+                            pdfEditor.encrypt(fis, password, fos)
                         }
                     }
                 } else {
@@ -160,10 +152,12 @@ class PdfEditHelper(
         cacheDir.mkdirs()
         clearCache()
         _needSave.set(false)
-        previewFile = File(cacheDir, "temp_${time}_input_${file.name}").apply {
-            file.copyTo(this)
-            operationStack.clear()
-            operationStack.setOriginalStream(this.copyAsByteArrayOS())
+        if (buildPreviewFile) {
+            previewFile = File(cacheDir, "temp_${time}_input_${file.name}").apply {
+                file.copyTo(this)
+                operationStack.clear()
+                operationStack.setOriginalStream(this.copyAsByteArrayOS())
+            }
         }
         coreListener?.onRedoUndoStateChanged(operationStack.canUndo, operationStack.canRedo)
         coreListener?.onSaveStateChanged(_needSave.get())

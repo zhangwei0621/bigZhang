@@ -1,4 +1,4 @@
-package com.study.openpdfdemo.viewer.view
+package com.study.openpdfdemo.viewer.view.op
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -6,32 +6,41 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.graphics.toColorInt
 import com.lowagie.text.Rectangle
 import com.study.openpdfdemo.utils.isInYRange
-import com.study.openpdfdemo.viewer.data.PageBridge
 import com.study.openpdfdemo.viewer.data.PageState
 import com.study.openpdfdemo.viewer.text.extractor.data.WordLine
+import com.study.openpdfdemo.viewer.view.EditOps
+import com.study.openpdfdemo.viewer.view.PdfViewerOverlay
+import com.study.openpdfdemo.viewer.view.PointMapper
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlin.math.abs
 
 /**
  * PDF编辑控制视图。这个控件接收用户输入，实现画笔和文本选择的坐标逻辑。
  */
 @SuppressLint("ViewConstructor")
-class PdfViewerOverlay(
+class PdfEditorPreview(
     context: Context,
-    private val pageBridge: PageBridge,
-    private val overlayInterface: OverlayInterface,
+    private val pageState: () -> PageState,
+    private val overlayInterface: PdfViewerOverlay.OverlayBaseInterface,
 ) : View(context) {
     private val moveThreshold = 2f
     private var focusX = 0f
     private var focusY = 0f
     private var currentLine = mutableListOf<PointMapper>()
     private var baseStrokeWidth = 4f
-    var enable: Boolean = true
+    private val ops = mutableListOf<EditOps>()
+    private val redoOps = mutableListOf<EditOps>()
+    private val _canRedo = MutableStateFlow(false)
+    private val _canUndo = MutableStateFlow(false)
+    val canRedo = _canRedo.asStateFlow()
+    val canUndo = _canUndo.asStateFlow()
 
     //画笔效果的预览画笔
     private val inkPaint = Paint().apply {
@@ -51,7 +60,17 @@ class PdfViewerOverlay(
         style = Paint.Style.FILL
         color = "#80C59172".toColorInt()
     }
+
+    private val highLightPaint = Paint().apply {
+        isAntiAlias = true
+        isDither = true
+        style = Paint.Style.FILL
+        color = Color.YELLOW
+        alpha = 128
+    }
     private val previewPath = Path()
+    private val inkPath = Path()
+    private val highLightPath = Path()
     private val textSelectData = TextSelectData()
 
     fun clearPreview() {
@@ -60,16 +79,94 @@ class PdfViewerOverlay(
         invalidate()
     }
 
+    fun undo() {
+        ops.removeLastOrNull()?.let { op ->
+            redoOps.add(op)
+        }
+        updateUndoRedoState()
+        invalidate()
+    }
+
+    fun redo() {
+        redoOps.removeLastOrNull()?.let { op ->
+            ops.add(op)
+        }
+        updateUndoRedoState()
+        invalidate()
+    }
+
+    fun save(): List<EditOps> {
+        val result = ops.toList()
+        ops.clear()
+        redoOps.clear()
+        updateUndoRedoState()
+        return result
+    }
+
+    private fun updateUndoRedoState() {
+        _canRedo.update { redoOps.isNotEmpty() }
+        _canUndo.update { ops.isNotEmpty() }
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         drawInkPreview(canvas)
         drawSelectTextPreview(canvas)
+        drawTextMarkUp(canvas)
+        drawInk(canvas)
+    }
+
+    private fun drawInk(canvas: Canvas) {
+        inkPath.reset()
+        ops.filterIsInstance<EditOps.Ink>().map { it.line }.forEach { points ->
+            if (points.isEmpty()) {
+                return
+            }
+            val fitScale = overlayInterface.getFitScale()
+            inkPaint.strokeWidth = baseStrokeWidth * fitScale
+            points.forEachIndexed { i, pointMapper ->
+                val pointF = pointMapper.androidPoint
+                if (points.size >= 2) {
+                    if (i == 0) {
+                        inkPath.moveTo(pointF.x, pointF.y)
+                    } else {
+                        inkPath.lineTo(pointF.x, pointF.y)
+                    }
+                } else {
+                    canvas.drawCircle(
+                        pointF.x,
+                        pointF.y,
+                        inkPaint.strokeWidth / 2f,
+                        inkPaint
+                    )
+                }
+            }
+        }
+        canvas.drawPath(inkPath, inkPaint)
+    }
+
+    private fun drawTextMarkUp(canvas: Canvas) {
+        ops.filterIsInstance<EditOps.HighLight>().map { it.lines }.forEach { lines ->
+            val fitScale = overlayInterface.getFitScale()
+            lines.forEach { line ->
+                val lineRect = line.getLineRectForAndroid(fitScale)
+                if (lineRect != null) {
+                    highLightPath.reset()
+                    highLightPath.moveTo(lineRect.left, lineRect.bottom)
+                    highLightPath.lineTo(lineRect.right, lineRect.bottom)
+                    highLightPath.lineTo(lineRect.right, lineRect.top)
+                    highLightPath.lineTo(lineRect.left, lineRect.top)
+                    highLightPath.close()
+                    canvas.drawPath(highLightPath, highLightPaint)
+                }
+            }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event == null || !enable) return super.onTouchEvent(event)
-        when (pageBridge.pageState) {
+        if (event == null) return super.onTouchEvent(event)
+        when (pageState()) {
             PageState.NormalReader -> {
                 return false
             }
@@ -116,7 +213,7 @@ class PdfViewerOverlay(
             }
 
             MotionEvent.ACTION_UP -> {
-                overlayInterface.onSelectTextResult(textSelectData.getSelectedLines())
+                doOp(EditOps.HighLight(textSelectData.getSelectedLines()))
                 textSelectData.reset()
                 invalidate()
             }
@@ -126,6 +223,12 @@ class PdfViewerOverlay(
                 invalidate()
             }
         }
+    }
+
+    private fun doOp(op: EditOps) {
+        ops.add(op)
+        redoOps.clear()
+        updateUndoRedoState()
     }
 
     //执行画笔的输入逻辑
@@ -163,8 +266,8 @@ class PdfViewerOverlay(
                     pdfLine += pdfPoint.x
                     pdfLine += pdfPoint.y
                 }
+                doOp(EditOps.Ink(ArrayList(currentLine)))
                 currentLine.clear()
-                overlayInterface.onInkFinish(pdfLine.toFloatArray())
             }
 
             MotionEvent.ACTION_CANCEL -> {
@@ -223,38 +326,6 @@ class PdfViewerOverlay(
                 }
             }
         }
-    }
-
-    interface OverlayInterface: OverlayBaseInterface {
-        fun onInkFinish(line: FloatArray)
-
-        fun onSelectTextResult(textLines: List<WordLine>)
-    }
-
-    interface OverlayBaseInterface {
-        fun requireStructuredText(): List<WordLine>
-
-        fun getFitScale(): Float
-    }
-
-    /**
-     * 存储一个点的坐标
-     */
-    data class PointMapper(
-        /**
-         * 该点在客户端的坐标，用于绘制预览
-         */
-        val androidPoint: PointF,
-
-        /**
-         * 该点在PDF坐标系的坐标，用于写到PDF文件中
-         */
-        val pdfPoint: PointF
-    ) {
-        constructor(androidX: Float, androidY: Float, pdfX: Float, pdfY: Float) : this(
-            PointF(androidX, androidY),
-            PointF(pdfX, pdfY)
-        )
     }
 
     class TextSelectData {
