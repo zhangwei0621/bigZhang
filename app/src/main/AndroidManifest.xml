@@ -22,6 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.FilterActivity" />
+        <activity android:name=".activity.AdjustActivity" />
     </application>
 
 </manifest>

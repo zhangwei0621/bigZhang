@@ -19,6 +19,7 @@ class MainActivity : BaseAct<ActivityMainBinding>() {
     private fun gotoFunc(func: DemoFunc) {
         when (func) {
             DemoFunc.MaskFilter -> gotoAct(FilterActivity::class.java)
+            DemoFunc.BaseAdjust -> gotoAct(AdjustActivity::class.java)
         }
     }
 
