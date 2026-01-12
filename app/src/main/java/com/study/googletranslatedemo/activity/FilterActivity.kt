@@ -40,7 +40,7 @@ class FilterActivity : BaseAct<ActivityFilterBinding>() {
         binding.btnFilter.setOnClickListener {
             val rule = _filterSet.next()
             binding.tvRule.text = rule
-            binding.img.setImageBitmap(_filterImage.applyRule(rule))
+            binding.img.setImageBitmap(_filterImage.applyProcessor(rule))
         }
     }
 }

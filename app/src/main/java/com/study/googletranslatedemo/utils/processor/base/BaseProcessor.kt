@@ -1,10 +1,15 @@
-package com.study.googletranslatedemo.utils.adjust.base
+package com.study.googletranslatedemo.utils.processor.base
 
-abstract class BaseAdjust(
+/**
+ * 语法："@method arg1 arg2.."，可以参考滤镜的写法。
+ * 如果默认实现无法满足，可以尝试重写[buildProcessor]等方法
+ */
+abstract class BaseProcessor(
     val minValue: Int,
     val maxValue: Int,
     val defaultValue: Int,
-    val rule: String,
+    val methodName: String,
+    val paramName: String,
     private val onValueChanged: (Int) -> Unit
 ) {
     protected var current = defaultValue
@@ -30,16 +35,16 @@ abstract class BaseAdjust(
     }
 
     /**
-     * 构建Cge方法块
+     * 构建参数
      */
-    open fun buildMethod(): String {
-        return "$rule ${buildCgeValue()}"
+    open fun buildParam(): String {
+        return "$paramName ${buildCgeValue()}"
     }
 
     /**
-     * 构建Cge规则块
+     * 构建处理器
      */
-    open fun buildRule(): String {
-        return "@adjust ${buildMethod()}"
+    open fun buildProcessor(): String {
+        return "@$methodName ${buildParam()}}"
     }
 }

@@ -19,10 +19,10 @@ class FilterImage {
     }
 
     /**
-     * 应用滤镜规则
+     * 应用Cge处理器
      * @return 参考[getDstBitmap]
      */
-    fun applyRule(rule: String?): Bitmap? {
+    fun applyProcessor(rule: String?): Bitmap? {
         srcBitmap?.let { bmp ->
             dstBitmap?.recycle()
             dstBitmap = if (!rule.isNullOrBlank()) {

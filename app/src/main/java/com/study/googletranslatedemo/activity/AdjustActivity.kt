@@ -5,14 +5,14 @@ import androidx.appcompat.widget.AppCompatSeekBar
 import com.study.googletranslatedemo.base.BaseAct
 import com.study.googletranslatedemo.databinding.ActivityAdjustBinding
 import com.study.googletranslatedemo.utils.PhotoPicker
-import com.study.googletranslatedemo.utils.adjust.BlurAdjust
-import com.study.googletranslatedemo.utils.adjust.BrightnessAdjust
-import com.study.googletranslatedemo.utils.adjust.ContrastAdjust
-import com.study.googletranslatedemo.utils.adjust.SaturationAdjust
-import com.study.googletranslatedemo.utils.adjust.SharpenAdjust
-import com.study.googletranslatedemo.utils.adjust.base.BaseAdjust
 import com.study.googletranslatedemo.utils.bitmap.BitmapUtils
 import com.study.googletranslatedemo.utils.filter.FilterImage
+import com.study.googletranslatedemo.utils.processor.BlurProcessor
+import com.study.googletranslatedemo.utils.processor.BrightnessProcessor
+import com.study.googletranslatedemo.utils.processor.ContrastProcessor
+import com.study.googletranslatedemo.utils.processor.SaturationProcessor
+import com.study.googletranslatedemo.utils.processor.SharpenProcessor
+import com.study.googletranslatedemo.utils.processor.base.BaseProcessor
 
 /**
  * 测试基本的参数调节。还有很多参数可用，这里只测试几个简单的
@@ -20,11 +20,11 @@ import com.study.googletranslatedemo.utils.filter.FilterImage
 class AdjustActivity : BaseAct<ActivityAdjustBinding>() {
     private val _photoPicker = PhotoPicker()
     private val _filterImage = FilterImage()
-    private val _brightness = BrightnessAdjust { applyAdjust() }
-    private val _contrast = ContrastAdjust { applyAdjust() }
-    private val _saturation = SaturationAdjust { applyAdjust() }
-    private val _sharpen = SharpenAdjust { applyAdjust() }
-    private val _blur = BlurAdjust { applyAdjust() }
+    private val _brightness = BrightnessProcessor { applyProcessor() }
+    private val _contrast = ContrastProcessor { applyProcessor() }
+    private val _saturation = SaturationProcessor { applyProcessor() }
+    private val _sharpen = SharpenProcessor { applyProcessor() }
+    private val _blur = BlurProcessor { applyProcessor() }
 
     override fun getViewBinding() = ActivityAdjustBinding.inflate(layoutInflater)
 
@@ -36,11 +36,11 @@ class AdjustActivity : BaseAct<ActivityAdjustBinding>() {
             }
         }
         binding.btnImage.setOnClickListener { _photoPicker.request() }
-        binding.sbBrightness.bindAdjust(_brightness)
-        binding.sbContrast.bindAdjust(_contrast)
-        binding.sbSaturation.bindAdjust(_saturation)
-        binding.sbSharpen.bindAdjust(_sharpen)
-        binding.sbBlur.bindAdjust(_blur)
+        binding.sbBrightness.bindProcessor(_brightness)
+        binding.sbContrast.bindProcessor(_contrast)
+        binding.sbSaturation.bindProcessor(_saturation)
+        binding.sbSharpen.bindProcessor(_sharpen)
+        binding.sbBlur.bindProcessor(_blur)
     }
 
     private fun reset() {
@@ -51,36 +51,36 @@ class AdjustActivity : BaseAct<ActivityAdjustBinding>() {
             sbSharpen.progress = _sharpen.defaultValue
             sbBlur.progress = _blur.defaultValue
         }
-        applyAdjust()
+        applyProcessor()
     }
 
-    private fun applyAdjust() {
-        // rule之间的空格不是必须的，只是为了好看
-        val rule = StringBuilder().apply {
-            append(_brightness.buildRule())
+    private fun applyProcessor() {
+        // 处理器之间的空格不是必须的，只是为了好看
+        val process = StringBuilder().apply {
+            append(_brightness.buildProcessor())
             append(" ")
-            append(_contrast.buildRule())
+            append(_contrast.buildProcessor())
             append(" ")
-            append(_saturation.buildRule())
+            append(_saturation.buildProcessor())
             append(" ")
-            append(_sharpen.buildRule())
+            append(_sharpen.buildProcessor())
             append(" ")
-            append(_blur.buildRule())
+            append(_blur.buildProcessor())
         }.toString()
-        binding.tvRule.text = rule
-        binding.img.setImageBitmap(_filterImage.applyRule(rule))
+        binding.tvRule.text = process
+        binding.img.setImageBitmap(_filterImage.applyProcessor(process))
     }
 
-    private fun AppCompatSeekBar.bindAdjust(adjust: BaseAdjust) {
-        min = adjust.minValue
-        max = adjust.maxValue
+    private fun AppCompatSeekBar.bindProcessor(processor: BaseProcessor) {
+        min = processor.minValue
+        max = processor.maxValue
         setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
                 seekBar: SeekBar?,
                 progress: Int,
                 fromUser: Boolean
             ) {
-                adjust.setValue(progress)
+                processor.setValue(progress)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
