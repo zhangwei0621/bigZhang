@@ -16,6 +16,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            // Use github hosted maven repo for now.
+            // Repo url: https://github.com/wysaid/android-gpuimage-plus-maven
+            url = uri("https://maven.wysaid.org/")
+        }
     }
 }
 
