@@ -45,6 +45,6 @@ abstract class BaseProcessor(
      * 构建处理器
      */
     open fun buildProcessor(): String {
-        return "@$methodName ${buildParam()}}"
+        return "@$methodName ${buildParam()}"
     }
 }

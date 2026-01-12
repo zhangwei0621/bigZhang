@@ -58,13 +58,13 @@ class AdjustActivity : BaseAct<ActivityAdjustBinding>() {
         // 处理器之间的空格不是必须的，只是为了好看
         val process = StringBuilder().apply {
             append(_brightness.buildProcessor())
-            append(" ")
+            append("\n")
             append(_contrast.buildProcessor())
-            append(" ")
+            append("\n")
             append(_saturation.buildProcessor())
-            append(" ")
+            append("\n")
             append(_sharpen.buildProcessor())
-            append(" ")
+            append("\n")
             append(_blur.buildProcessor())
         }.toString()
         binding.tvRule.text = process
