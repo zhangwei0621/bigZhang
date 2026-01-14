@@ -6,6 +6,7 @@ import com.study.googletranslatedemo.base.BaseAct
 import com.study.googletranslatedemo.data.DemoFunc
 import com.study.googletranslatedemo.databinding.ActivityMainBinding
 
+
 class MainActivity : BaseAct<ActivityMainBinding>() {
     override fun getViewBinding() = ActivityMainBinding.inflate(layoutInflater)
 
@@ -20,6 +21,8 @@ class MainActivity : BaseAct<ActivityMainBinding>() {
         when (func) {
             DemoFunc.MaskFilter -> gotoAct(FilterActivity::class.java)
             DemoFunc.BaseAdjust -> gotoAct(AdjustActivity::class.java)
+            DemoFunc.ShapeMask -> gotoAct(ShapeMaskActivity::class.java)
+            DemoFunc.FilterMask -> gotoAct(FilterMaskActivity::class.java)
         }
     }
 
