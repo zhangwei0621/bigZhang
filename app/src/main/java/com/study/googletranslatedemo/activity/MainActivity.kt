@@ -23,6 +23,7 @@ class MainActivity : BaseAct<ActivityMainBinding>() {
             DemoFunc.BaseAdjust -> gotoAct(AdjustActivity::class.java)
             DemoFunc.ShapeMask -> gotoAct(ShapeMaskActivity::class.java)
             DemoFunc.FilterMask -> gotoAct(FilterMaskActivity::class.java)
+            DemoFunc.Crop -> gotoAct(CropActivity::class.java)
         }
     }
 

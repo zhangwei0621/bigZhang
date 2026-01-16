@@ -25,6 +25,7 @@
         <activity android:name=".activity.AdjustActivity" />
         <activity android:name=".activity.ShapeMaskActivity" />
         <activity android:name=".activity.FilterMaskActivity" />
+        <activity android:name=".activity.CropActivity" />
     </application>
 
 </manifest>

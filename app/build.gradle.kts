@@ -53,4 +53,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(libs.gpuimage.android)
+    //图像裁切库
+    implementation("com.vanniktech:android-image-cropper:4.7.0")
 }
