@@ -7,6 +7,8 @@ enum class DemoFunc(
     BaseAdjust("基本参数"),
     ShapeMask("形状遮罩"),
     FilterMask("滤镜遮罩"),
-    Crop("裁剪")
+    Crop("裁剪"),
+    Painter("画笔"),
+    PainterFilter("滤镜画笔")
 
 }

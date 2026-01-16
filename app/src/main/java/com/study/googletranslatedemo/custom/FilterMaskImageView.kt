@@ -43,10 +43,6 @@ class FilterMaskImageView @JvmOverloads constructor(
         xfermode = PorterDuffXfermode(defaultMaskMode)
     }
 
-    init {
-        isDrawingCacheEnabled = true
-    }
-
     fun setFilter(filter: String) {
         _filter = filter
         applyFilter()

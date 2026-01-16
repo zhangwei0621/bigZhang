@@ -26,6 +26,8 @@
         <activity android:name=".activity.ShapeMaskActivity" />
         <activity android:name=".activity.FilterMaskActivity" />
         <activity android:name=".activity.CropActivity" />
+        <activity android:name=".activity.PaintActivity" />
+        <activity android:name=".activity.FilterPaintActivity" />
     </application>
 
 </manifest>

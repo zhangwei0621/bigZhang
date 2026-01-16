@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.study.googletranslatedemo.custom.PaintImageView
+        android:id="@+id/img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择图像" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_eraser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="橡皮擦模式：OFF" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_paint_effect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="启用画笔特效" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_undo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="撤销" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_redo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="重做" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
