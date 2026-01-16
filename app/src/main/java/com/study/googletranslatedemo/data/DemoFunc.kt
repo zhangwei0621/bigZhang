@@ -9,6 +9,7 @@ enum class DemoFunc(
     FilterMask("滤镜遮罩"),
     Crop("裁剪"),
     Painter("画笔"),
-    PainterFilter("滤镜画笔")
+    PainterFilter("滤镜画笔"),
+    Frame("Frame")
 
 }

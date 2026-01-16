@@ -26,6 +26,7 @@ class MainActivity : BaseAct<ActivityMainBinding>() {
             DemoFunc.Crop -> gotoAct(CropActivity::class.java)
             DemoFunc.Painter -> gotoAct(PaintActivity::class.java)
             DemoFunc.PainterFilter -> gotoAct(FilterPaintActivity::class.java)
+            DemoFunc.Frame -> gotoAct(FrameActivity::class.java)
         }
     }
 

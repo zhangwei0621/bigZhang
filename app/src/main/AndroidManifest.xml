@@ -28,6 +28,7 @@
         <activity android:name=".activity.CropActivity" />
         <activity android:name=".activity.PaintActivity" />
         <activity android:name=".activity.FilterPaintActivity" />
+        <activity android:name=".activity.FrameActivity" />
     </application>
 
 </manifest>
