@@ -21,14 +21,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.FilterActivity" />
-        <activity android:name=".activity.AdjustActivity" />
-        <activity android:name=".activity.ShapeMaskActivity" />
-        <activity android:name=".activity.FilterMaskActivity" />
-        <activity android:name=".activity.CropActivity" />
-        <activity android:name=".activity.PaintActivity" />
-        <activity android:name=".activity.FilterPaintActivity" />
-        <activity android:name=".activity.FrameActivity" />
+        <activity android:name="com.study.googletranslatedemo.demo.editor.filter.FilterActivity" />
+        <activity android:name="com.study.googletranslatedemo.demo.editor.adjust.AdjustActivity" />
+        <activity android:name=".develop.shapemask.ShapeMaskActivity" />
+        <activity android:name=".develop.filtermask.FilterMaskActivity" />
+        <activity android:name="com.study.googletranslatedemo.demo.editor.crop.CropActivity" />
+        <activity android:name="com.study.googletranslatedemo.demo.editor.draw.PaintActivity" />
+        <activity android:name=".demo.editor.effect.splash.FilterPaintActivity" />
+        <activity android:name="com.study.googletranslatedemo.demo.editor.frame.FrameActivity" />
     </application>
 
 </manifest>

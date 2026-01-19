@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.study.googletranslatedemo.custom.FilterPaintImageView
+    <com.study.googletranslatedemo.demo.editor.effect.splash.custom.FilterPaintImageView
         android:id="@+id/img"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

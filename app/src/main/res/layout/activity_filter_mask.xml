@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.study.googletranslatedemo.custom.FilterMaskImageView
+    <com.study.googletranslatedemo.develop.filtermask.custom.FilterMaskImageView
         android:id="@+id/img"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

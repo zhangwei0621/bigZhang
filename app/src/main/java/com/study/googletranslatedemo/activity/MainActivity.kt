@@ -5,6 +5,14 @@ import com.study.googletranslatedemo.adapter.DemoFuncAdapter
 import com.study.googletranslatedemo.base.BaseAct
 import com.study.googletranslatedemo.data.DemoFunc
 import com.study.googletranslatedemo.databinding.ActivityMainBinding
+import com.study.googletranslatedemo.demo.editor.adjust.AdjustActivity
+import com.study.googletranslatedemo.demo.editor.blur.BlurImpl
+import com.study.googletranslatedemo.demo.editor.crop.CropActivity
+import com.study.googletranslatedemo.demo.editor.draw.PaintActivity
+import com.study.googletranslatedemo.demo.editor.effect.splash.FilterPaintActivity
+import com.study.googletranslatedemo.demo.editor.filter.FilterActivity
+import com.study.googletranslatedemo.demo.editor.frame.FrameActivity
+import com.study.googletranslatedemo.utils.filter.FilterRule
 
 
 class MainActivity : BaseAct<ActivityMainBinding>() {
@@ -19,14 +27,13 @@ class MainActivity : BaseAct<ActivityMainBinding>() {
 
     private fun gotoFunc(func: DemoFunc) {
         when (func) {
-            DemoFunc.MaskFilter -> gotoAct(FilterActivity::class.java)
-            DemoFunc.BaseAdjust -> gotoAct(AdjustActivity::class.java)
-            DemoFunc.ShapeMask -> gotoAct(ShapeMaskActivity::class.java)
-            DemoFunc.FilterMask -> gotoAct(FilterMaskActivity::class.java)
-            DemoFunc.Crop -> gotoAct(CropActivity::class.java)
-            DemoFunc.Painter -> gotoAct(PaintActivity::class.java)
-            DemoFunc.PainterFilter -> gotoAct(FilterPaintActivity::class.java)
-            DemoFunc.Frame -> gotoAct(FrameActivity::class.java)
+            DemoFunc.EditorCrop -> gotoAct(CropActivity::class.java)
+            DemoFunc.EditorFilter -> gotoAct(FilterActivity::class.java)
+            DemoFunc.EditorAdjust -> gotoAct(AdjustActivity::class.java)
+            DemoFunc.EditorEffectSplash -> FilterPaintActivity.start(this, FilterRule.BLACK)
+            DemoFunc.EditorFrame -> gotoAct(FrameActivity::class.java)
+            DemoFunc.EditorPainter -> gotoAct(PaintActivity::class.java)
+            DemoFunc.EditorBlur -> BlurImpl.start(this)
         }
     }
 

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.study.googletranslatedemo.custom.FrameImageViewOuter
+    <com.study.googletranslatedemo.demo.editor.frame.custom.FrameImageViewOuter
         android:id="@+id/img"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,9 +20,20 @@
             android:layout_height="wrap_content"
             android:text="选择图像" />
 
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/sb_width"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="宽度" />
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/sb_width"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
     </LinearLayout>
 </FrameLayout>
