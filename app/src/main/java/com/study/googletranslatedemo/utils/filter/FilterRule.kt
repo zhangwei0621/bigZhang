@@ -24,4 +24,9 @@ object FilterRule {
      * 组合滤镜:黑白+模糊
      */
     const val BLACK_AND_BLUR = "$BLACK $BLUR"
+
+    /**
+     * 纹理混合
+     */
+    const val EFFECT_BLEND = "@krblend mix effect_1.jpg 75"
 }

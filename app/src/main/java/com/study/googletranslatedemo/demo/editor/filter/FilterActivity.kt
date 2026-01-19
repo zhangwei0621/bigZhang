@@ -21,6 +21,7 @@ class FilterActivity : BaseAct<ActivityFilterBinding>() {
             FilterRule.SKETCH,
             FilterRule.BLUR,
             FilterRule.BLACK_AND_BLUR,
+            FilterRule.EFFECT_BLEND,
             ""
         )
     )
