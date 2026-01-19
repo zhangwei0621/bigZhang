@@ -1,10 +1,12 @@
 package com.study.googletranslatedemo.activity
 
 import android.content.Intent
+import android.util.Log
 import com.study.googletranslatedemo.adapter.DevelopFuncAdapter
 import com.study.googletranslatedemo.base.BaseAct
 import com.study.googletranslatedemo.data.DevelopFunc
 import com.study.googletranslatedemo.databinding.ActivityMainBinding
+import com.study.googletranslatedemo.develop.decode.DecodeHelper
 import com.study.googletranslatedemo.develop.filtermask.FilterMaskActivity
 import com.study.googletranslatedemo.develop.shapemask.ShapeMaskActivity
 
@@ -25,6 +27,7 @@ class DevelopActivity : BaseAct<ActivityMainBinding>() {
         when (func) {
             DevelopFunc.ShapeMask -> gotoAct(ShapeMaskActivity::class.java)
             DevelopFunc.FilterMask -> gotoAct(FilterMaskActivity::class.java)
+            DevelopFunc.Decode -> Log.d("", "${DecodeHelper().test()}")
         }
     }
 

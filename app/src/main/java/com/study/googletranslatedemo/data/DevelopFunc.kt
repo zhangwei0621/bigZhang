@@ -7,5 +7,6 @@ enum class DevelopFunc(
     val title: String
 ) {
     ShapeMask("ShapeMask"),
-    FilterMask("FilterMask")
+    FilterMask("FilterMask"),
+    Decode("Decode")
 }
