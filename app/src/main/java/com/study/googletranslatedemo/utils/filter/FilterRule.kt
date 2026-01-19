@@ -30,6 +30,7 @@ object FilterRule {
      */
     const val EFFECT_BLEND_1 = "@krblend mix effect_1.jpg 75"
     const val EFFECT_BLEND_2 = "@krblend mix hehe.jpg 75"
+    const val EFFECT_BLEND_3 = "@blend addrev effect_2.png 100"
 
     /**
      * lut滤镜

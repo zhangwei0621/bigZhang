@@ -23,6 +23,7 @@ class FilterActivity : BaseAct<ActivityFilterBinding>() {
             FilterRule.BLACK_AND_BLUR,
             FilterRule.EFFECT_BLEND_1,
             FilterRule.EFFECT_BLEND_2,
+            FilterRule.EFFECT_BLEND_3,
             FilterRule.LUT_1,
             FilterRule.LUT_2,
             FilterRule.LUT_3,

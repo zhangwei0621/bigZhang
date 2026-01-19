@@ -12,6 +12,7 @@ import com.study.googletranslatedemo.demo.editor.draw.PaintActivity
 import com.study.googletranslatedemo.demo.editor.effect.splash.FilterPaintActivity
 import com.study.googletranslatedemo.demo.editor.filter.FilterActivity
 import com.study.googletranslatedemo.demo.editor.frame.FrameActivity
+import com.study.googletranslatedemo.demo.editor.sticker.StickerActivity
 import com.study.googletranslatedemo.utils.filter.FilterRule
 
 
@@ -35,6 +36,7 @@ class MainActivity : BaseAct<ActivityMainBinding>() {
             DemoFunc.EditorFrame -> gotoAct(FrameActivity::class.java)
             DemoFunc.EditorPainter -> gotoAct(PaintActivity::class.java)
             DemoFunc.EditorBlur -> BlurImpl.start(this)
+            DemoFunc.EditorSticker -> gotoAct(StickerActivity::class.java)
         }
     }
 
