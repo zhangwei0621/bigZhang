@@ -1,25 +1,26 @@
 package com.study.googletranslatedemo.demo.editor.adjust
 
+import android.graphics.Bitmap
 import android.widget.SeekBar
 import androidx.appcompat.widget.AppCompatSeekBar
 import com.study.googletranslatedemo.base.BaseAct
 import com.study.googletranslatedemo.databinding.ActivityAdjustBinding
-import com.study.googletranslatedemo.utils.PhotoPicker
-import com.study.googletranslatedemo.utils.bitmap.BitmapUtils
-import com.study.googletranslatedemo.utils.filter.FilterImage
 import com.study.googletranslatedemo.demo.editor.adjust.processor.BlurProcessor
 import com.study.googletranslatedemo.demo.editor.adjust.processor.BrightnessProcessor
 import com.study.googletranslatedemo.demo.editor.adjust.processor.ContrastProcessor
 import com.study.googletranslatedemo.demo.editor.adjust.processor.SaturationProcessor
 import com.study.googletranslatedemo.demo.editor.adjust.processor.SharpenProcessor
 import com.study.googletranslatedemo.demo.editor.adjust.processor.base.BaseProcessor
+import com.study.googletranslatedemo.utils.PhotoPicker
+import com.study.googletranslatedemo.utils.bitmap.BitmapUtils
+import com.study.googletranslatedemo.utils.filter.FilterImage
 
 /**
  * 测试基本的参数调节。还有很多参数可用，这里只测试几个简单的
  */
 class AdjustActivity : BaseAct<ActivityAdjustBinding>() {
     private val _photoPicker = PhotoPicker()
-    private val _filterImage = FilterImage()
+    private var _srcBitmap: Bitmap? = null
     private val _brightness = BrightnessProcessor { applyProcessor() }
     private val _contrast = ContrastProcessor { applyProcessor() }
     private val _saturation = SaturationProcessor { applyProcessor() }
@@ -31,7 +32,7 @@ class AdjustActivity : BaseAct<ActivityAdjustBinding>() {
     override fun initView() {
         _photoPicker.register(this) { uri ->
             BitmapUtils.uriToBitmap(this, uri)?.let { bmp ->
-                _filterImage.setSrcBitmap(bmp)
+                _srcBitmap = bmp
                 reset()
             }
         }
@@ -68,7 +69,7 @@ class AdjustActivity : BaseAct<ActivityAdjustBinding>() {
             append(_blur.buildProcessor())
         }.toString()
         binding.tvRule.text = process
-        binding.img.setImageBitmap(_filterImage.applyProcessor(process))
+        binding.img.setImageBitmap(FilterImage.applyFilter(_srcBitmap, process))
     }
 
     private fun AppCompatSeekBar.bindProcessor(processor: BaseProcessor) {

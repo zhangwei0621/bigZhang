@@ -1,5 +1,7 @@
 package com.study.googletranslatedemo.demo.editor.filter
 
+import android.graphics.Bitmap
+import android.widget.SeekBar
 import com.study.googletranslatedemo.base.BaseAct
 import com.study.googletranslatedemo.databinding.ActivityFilterBinding
 import com.study.googletranslatedemo.utils.DataLooper
@@ -13,7 +15,6 @@ import com.study.googletranslatedemo.utils.filter.FilterRule
  */
 class FilterActivity : BaseAct<ActivityFilterBinding>() {
     private val _photoPicker = PhotoPicker()
-    private val _filterImage = FilterImage()
     private val _filterSet = DataLooper(
         listOf(
             FilterRule.BLACK,
@@ -23,24 +24,52 @@ class FilterActivity : BaseAct<ActivityFilterBinding>() {
             ""
         )
     )
+    private var _srcBitmap: Bitmap? = null
+    private var _intensity: Float = 1f
+    private var _filter: String? = ""
 
     override fun getViewBinding() = ActivityFilterBinding.inflate(layoutInflater)
 
     override fun initView() {
         _photoPicker.register(this) { uri ->
             BitmapUtils.uriToBitmap(this, uri)?.let { bmp ->
-                _filterImage.clear()
-                _filterImage.setSrcBitmap(bmp)
-                binding.img.setImageBitmap(_filterImage.getDstBitmap())
-                binding.tvRule.text = ""
+                _srcBitmap = bmp
+                binding.img.setImageBitmap(bmp)
                 _filterSet.reset()
+                _filter = ""
             }
         }
         binding.btnImage.setOnClickListener { _photoPicker.request() }
         binding.btnFilter.setOnClickListener {
-            val rule = _filterSet.next()
-            binding.tvRule.text = rule
-            binding.img.setImageBitmap(_filterImage.applyProcessor(rule))
+            _filter = _filterSet.next()
+            updateImage()
         }
+        binding.sbIntensity.apply {
+            progress = 100
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                    _intensity = progress / 100f
+                    updateImage()
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+                }
+
+            })
+        }
+    }
+
+    private fun updateImage() {
+        binding.tvRule.text = _filter
+        binding.img.setImageBitmap(FilterImage.applyFilter(_srcBitmap, _filter, _intensity))
     }
 }
