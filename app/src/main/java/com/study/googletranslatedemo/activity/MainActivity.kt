@@ -27,6 +27,7 @@ class MainActivity : BaseAct<ActivityMainBinding>() {
 
     private fun gotoFunc(func: DemoFunc) {
         when (func) {
+            DemoFunc.DevelopFunction -> gotoAct(DevelopActivity::class.java)
             DemoFunc.EditorCrop -> gotoAct(CropActivity::class.java)
             DemoFunc.EditorFilter -> gotoAct(FilterActivity::class.java)
             DemoFunc.EditorAdjust -> gotoAct(AdjustActivity::class.java)

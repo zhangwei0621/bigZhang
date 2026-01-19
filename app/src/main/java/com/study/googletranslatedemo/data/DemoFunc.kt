@@ -6,6 +6,7 @@ package com.study.googletranslatedemo.data
 enum class DemoFunc(
     val title: String
 ) {
+    DevelopFunction("技术测试"),
     EditorCrop("Editor-Crop"),
     EditorFilter("Editor-Filter"),
     EditorAdjust("Editor-Adjust"),
