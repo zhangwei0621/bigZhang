@@ -28,5 +28,16 @@ object FilterRule {
     /**
      * 纹理混合
      */
-    const val EFFECT_BLEND = "@krblend mix effect_1.jpg 75"
+    const val EFFECT_BLEND_1 = "@krblend mix effect_1.jpg 75"
+    const val EFFECT_BLEND_2 = "@krblend mix hehe.jpg 75"
+
+    /**
+     * lut滤镜
+     */
+    const val LUT_1 = "@adjust lut edgy_amber.png"
+    const val LUT_2 = "@adjust lut filmstock.png"
+    const val LUT_3 = "@adjust lut foggy_night.png"
+    const val LUT_4 = "@adjust lut late_sunset.png"
+    const val LUT_5 = "@adjust lut soft_warming.png"
+    const val LUT_6 = "@adjust lut wildbird.png"
 }

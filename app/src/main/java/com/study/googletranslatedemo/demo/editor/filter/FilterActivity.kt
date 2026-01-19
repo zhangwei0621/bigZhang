@@ -21,7 +21,14 @@ class FilterActivity : BaseAct<ActivityFilterBinding>() {
             FilterRule.SKETCH,
             FilterRule.BLUR,
             FilterRule.BLACK_AND_BLUR,
-            FilterRule.EFFECT_BLEND,
+            FilterRule.EFFECT_BLEND_1,
+            FilterRule.EFFECT_BLEND_2,
+            FilterRule.LUT_1,
+            FilterRule.LUT_2,
+            FilterRule.LUT_3,
+            FilterRule.LUT_4,
+            FilterRule.LUT_5,
+            FilterRule.LUT_6,
             ""
         )
     )
