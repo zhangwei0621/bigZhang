@@ -10,7 +10,7 @@ import com.study.googletranslatedemo.R
 import com.study.googletranslatedemo.base.BaseAct
 import com.study.googletranslatedemo.databinding.ActivityStickerBinding
 import com.study.googletranslatedemo.utils.FileUtils
-import com.study.googletranslatedemo.utils.gesture.GeneralGestureTouchListener
+import com.study.googletranslatedemo.utils.gesture.DragPinchRotateTouchListener
 
 class StickerActivity : BaseAct<ActivityStickerBinding>() {
     private var _currentStickerView: AppCompatImageView? = null
@@ -42,8 +42,8 @@ class StickerActivity : BaseAct<ActivityStickerBinding>() {
         AppCompatImageView(this).apply {
             setImageResource(R.drawable.sticker)
             layoutParams = RelativeLayout.LayoutParams(350, 350)
-            // todo 这个是Ai扒竞品整合的代码，能用但是移动时老是抽抽，需要优化，但大致原理就是这样
-            setOnTouchListener(GeneralGestureTouchListener())
+            // 这个是Ai扒竞品代码实现的，需要审核一下
+            setOnTouchListener(DragPinchRotateTouchListener(this@StickerActivity))
             setOnClickListener { selectSticker(this) }
             binding.frameSticker.addView(this)
             selectSticker(this)
