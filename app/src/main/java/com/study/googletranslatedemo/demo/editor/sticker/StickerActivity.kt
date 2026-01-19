@@ -43,7 +43,7 @@ class StickerActivity : BaseAct<ActivityStickerBinding>() {
             setImageResource(R.drawable.sticker)
             layoutParams = RelativeLayout.LayoutParams(350, 350)
             // 这个是Ai扒竞品代码实现的，需要审核一下
-            setOnTouchListener(DragPinchRotateTouchListener(this@StickerActivity))
+            setOnTouchListener(DragPinchRotateTouchListener())
             setOnClickListener { selectSticker(this) }
             binding.frameSticker.addView(this)
             selectSticker(this)
