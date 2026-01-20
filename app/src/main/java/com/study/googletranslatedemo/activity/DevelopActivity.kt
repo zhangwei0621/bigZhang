@@ -28,7 +28,7 @@ class DevelopActivity : BaseAct<ActivityDevelopBinding>() {
         when (func) {
             DevelopFunc.ShapeMask -> gotoAct(ShapeMaskActivity::class.java)
             DevelopFunc.FilterMask -> gotoAct(FilterMaskActivity::class.java)
-            DevelopFunc.Decode -> Log.d("", "${DecodeHelper().test()}")
+            DevelopFunc.Decode -> Log.d("decode", "${DecodeHelper().test()}")
             DevelopFunc.Paint -> gotoAct(PaintActivity::class.java)
         }
     }
