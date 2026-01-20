@@ -9,6 +9,7 @@ import com.study.googletranslatedemo.demo.editor.adjust.AdjustActivity
 import com.study.googletranslatedemo.demo.editor.blur.BlurImpl
 import com.study.googletranslatedemo.demo.editor.crop.CropActivity
 import com.study.googletranslatedemo.demo.editor.draw.DrawActivity
+import com.study.googletranslatedemo.demo.editor.draw.MosaicDrawActivity
 import com.study.googletranslatedemo.demo.editor.effect.splash.FilterPaintActivity
 import com.study.googletranslatedemo.demo.editor.filter.FilterActivity
 import com.study.googletranslatedemo.demo.editor.frame.FrameActivity
@@ -34,6 +35,7 @@ class MainActivity : BaseAct<ActivityMainBinding>() {
             DemoFunc.EditorEffectSplash -> FilterPaintActivity.start(this, FilterRule.BLACK)
             DemoFunc.EditorFrame -> gotoAct(FrameActivity::class.java)
             DemoFunc.EditorDraw -> gotoAct(DrawActivity::class.java)
+            DemoFunc.EditorDrawMosaic -> gotoAct(MosaicDrawActivity::class.java)
             DemoFunc.EditorBlur -> BlurImpl.start(this)
             DemoFunc.EditorSticker -> gotoAct(StickerActivity::class.java)
         }

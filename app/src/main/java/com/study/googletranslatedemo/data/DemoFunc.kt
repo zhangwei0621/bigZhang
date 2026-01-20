@@ -13,6 +13,7 @@ enum class DemoFunc(
     EditorEffectSplash("Editor-Effect-Splash"),
     EditorFrame("Editor-Frame"),
     EditorDraw("Editor-Draw"),
+    EditorDrawMosaic("Editor-Draw(Mosaic)"),
     EditorBlur("Editor-Blur"),
     EditorSticker("Editor-Sticker")
 }

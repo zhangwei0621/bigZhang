@@ -33,6 +33,7 @@
         <activity android:name=".activity.DevelopActivity" />
         <activity android:name=".demo.editor.sticker.StickerActivity" />
         <activity android:name=".demo.editor.draw.DrawActivity" />
+        <activity android:name=".demo.editor.draw.MosaicDrawActivity" />
     </application>
 
 </manifest>

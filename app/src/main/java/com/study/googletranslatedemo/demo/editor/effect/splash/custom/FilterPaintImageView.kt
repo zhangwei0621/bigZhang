@@ -147,6 +147,7 @@ class FilterPaintImageView @JvmOverloads constructor(
 
             // 计算适配矩阵
             val matrix = Matrix()
+            // TODO: 这时候layout不一定已经完成，不能获取当前View的宽高，优化
             val minScale = min(width * 1f / bm.width, height * 1f / bm.height)
             val w = bm.width * minScale
             val h = bm.height * minScale

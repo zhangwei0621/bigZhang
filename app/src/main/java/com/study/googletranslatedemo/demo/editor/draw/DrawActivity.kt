@@ -67,7 +67,8 @@ class DrawActivity : BaseAct<ActivityDrawBinding>() {
                     progress: Int,
                     fromUser: Boolean
                 ) {
-
+                    val size = (seekBar?.progress?.toFloat() ?: 20f).dp(this@DrawActivity)
+                    binding.paintView.brushSize = size
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -75,8 +76,7 @@ class DrawActivity : BaseAct<ActivityDrawBinding>() {
                 }
 
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                    val size = (seekBar?.progress?.toFloat() ?: 20f).dp(this@DrawActivity)
-                    binding.paintView.brushSize = size
+
                 }
             })
             progress = 25
@@ -90,7 +90,8 @@ class DrawActivity : BaseAct<ActivityDrawBinding>() {
                     progress: Int,
                     fromUser: Boolean
                 ) {
-
+                    val alpha = seekBar?.progress ?: 255
+                    binding.paintView.brushAlpha = alpha
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -98,8 +99,7 @@ class DrawActivity : BaseAct<ActivityDrawBinding>() {
                 }
 
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                    val alpha = seekBar?.progress ?: 255
-                    binding.paintView.brushAlpha = alpha
+
                 }
             })
             progress = 255
