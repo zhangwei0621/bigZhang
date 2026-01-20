@@ -1,8 +1,8 @@
-package com.study.googletranslatedemo.demo.editor.draw
+package com.study.googletranslatedemo.develop.paint
 
 import com.study.googletranslatedemo.base.BaseAct
 import com.study.googletranslatedemo.databinding.ActivityPaintBinding
-import com.study.googletranslatedemo.demo.editor.draw.data.PaintEffect
+import com.study.googletranslatedemo.develop.paint.data.PaintEffect
 import com.study.googletranslatedemo.utils.DataLooper
 import com.study.googletranslatedemo.utils.OperateStackListener
 import com.study.googletranslatedemo.utils.PhotoPicker

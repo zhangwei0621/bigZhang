@@ -1,4 +1,4 @@
-package com.study.googletranslatedemo.utils
+package com.study.googletranslatedemo.utils.expand
 
 import android.app.Activity
 import android.content.Intent

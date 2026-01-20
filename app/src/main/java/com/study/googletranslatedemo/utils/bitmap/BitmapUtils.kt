@@ -36,6 +36,16 @@ object BitmapUtils {
     }
 
     /**
+     * 校验bitmap是否有效
+     */
+    fun Bitmap?.isValid(): Boolean {
+        if (this == null) return false
+        if (this.isRecycled) return false
+        if (this.width <= 0 || this.height <= 0) return false
+        return true
+    }
+
+    /**
      * 将bitmap保存为png图像文件
      */
     fun writeBitmapToPng(

@@ -6,11 +6,11 @@ import com.study.googletranslatedemo.base.BaseAct
 import com.study.googletranslatedemo.databinding.ActivityFilterPaintBinding
 import com.study.googletranslatedemo.utils.OperateStackListener
 import com.study.googletranslatedemo.utils.PhotoPicker
-import com.study.googletranslatedemo.utils.addParams
+import com.study.googletranslatedemo.utils.expand.addParams
 import com.study.googletranslatedemo.utils.bitmap.BitmapUtils
-import com.study.googletranslatedemo.utils.createIntent
-import com.study.googletranslatedemo.utils.getString
-import com.study.googletranslatedemo.utils.start
+import com.study.googletranslatedemo.utils.expand.createIntent
+import com.study.googletranslatedemo.utils.expand.getString
+import com.study.googletranslatedemo.utils.expand.start
 
 /**
  * 自由画笔+滤镜测试

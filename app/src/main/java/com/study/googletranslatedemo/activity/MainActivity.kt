@@ -8,13 +8,12 @@ import com.study.googletranslatedemo.databinding.ActivityMainBinding
 import com.study.googletranslatedemo.demo.editor.adjust.AdjustActivity
 import com.study.googletranslatedemo.demo.editor.blur.BlurImpl
 import com.study.googletranslatedemo.demo.editor.crop.CropActivity
-import com.study.googletranslatedemo.demo.editor.draw.PaintActivity
+import com.study.googletranslatedemo.demo.editor.draw.DrawActivity
 import com.study.googletranslatedemo.demo.editor.effect.splash.FilterPaintActivity
 import com.study.googletranslatedemo.demo.editor.filter.FilterActivity
 import com.study.googletranslatedemo.demo.editor.frame.FrameActivity
 import com.study.googletranslatedemo.demo.editor.sticker.StickerActivity
 import com.study.googletranslatedemo.utils.filter.FilterRule
-
 
 class MainActivity : BaseAct<ActivityMainBinding>() {
     override fun getViewBinding() = ActivityMainBinding.inflate(layoutInflater)
@@ -34,7 +33,7 @@ class MainActivity : BaseAct<ActivityMainBinding>() {
             DemoFunc.EditorAdjust -> gotoAct(AdjustActivity::class.java)
             DemoFunc.EditorEffectSplash -> FilterPaintActivity.start(this, FilterRule.BLACK)
             DemoFunc.EditorFrame -> gotoAct(FrameActivity::class.java)
-            DemoFunc.EditorPainter -> gotoAct(PaintActivity::class.java)
+            DemoFunc.EditorDraw -> gotoAct(DrawActivity::class.java)
             DemoFunc.EditorBlur -> BlurImpl.start(this)
             DemoFunc.EditorSticker -> gotoAct(StickerActivity::class.java)
         }

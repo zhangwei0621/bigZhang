@@ -27,11 +27,12 @@
         <activity android:name=".develop.shapemask.ShapeMaskActivity" />
         <activity android:name=".develop.filtermask.FilterMaskActivity" />
         <activity android:name="com.study.googletranslatedemo.demo.editor.crop.CropActivity" />
-        <activity android:name="com.study.googletranslatedemo.demo.editor.draw.PaintActivity" />
+        <activity android:name="com.study.googletranslatedemo.develop.paint.PaintActivity" />
         <activity android:name=".demo.editor.effect.splash.FilterPaintActivity" />
         <activity android:name="com.study.googletranslatedemo.demo.editor.frame.FrameActivity" />
         <activity android:name=".activity.DevelopActivity" />
         <activity android:name=".demo.editor.sticker.StickerActivity" />
+        <activity android:name=".demo.editor.draw.DrawActivity" />
     </application>
 
 </manifest>

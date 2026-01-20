@@ -1,4 +1,4 @@
-package com.study.googletranslatedemo.demo.editor.draw.data
+package com.study.googletranslatedemo.develop.paint.data
 
 /**
  * 画笔特效

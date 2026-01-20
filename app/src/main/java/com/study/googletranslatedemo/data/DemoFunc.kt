@@ -12,7 +12,7 @@ enum class DemoFunc(
     EditorAdjust("Editor-Adjust"),
     EditorEffectSplash("Editor-Effect-Splash"),
     EditorFrame("Editor-Frame"),
-    EditorPainter("Editor-Draw"),
+    EditorDraw("Editor-Draw"),
     EditorBlur("Editor-Blur"),
     EditorSticker("Editor-Sticker")
 }

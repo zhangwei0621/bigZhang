@@ -1,4 +1,4 @@
-package com.study.googletranslatedemo.demo.editor.draw.custom
+package com.study.googletranslatedemo.develop.paint.custom
 
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -15,7 +15,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatImageView
 import com.study.googletranslatedemo.R
-import com.study.googletranslatedemo.demo.editor.draw.data.PaintEffect
+import com.study.googletranslatedemo.develop.paint.data.PaintEffect
 import com.study.googletranslatedemo.utils.OperateStackListener
 
 /**
