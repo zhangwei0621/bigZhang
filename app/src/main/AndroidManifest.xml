@@ -34,6 +34,7 @@
         <activity android:name=".demo.editor.sticker.StickerActivity" />
         <activity android:name=".demo.editor.draw.DrawActivity" />
         <activity android:name=".demo.editor.draw.MosaicDrawActivity" />
+        <activity android:name=".demo.editor.sqbg.SqbgActivity" />
     </application>
 
 </manifest>

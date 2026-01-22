@@ -18,7 +18,12 @@ object FilterRule {
     /**
      * 模糊
      */
-    const val BLUR = "@blur lerp 0.5 0"
+    const val BLUR = "@blur lerp 0.5 1"
+
+    /**
+     * 超级模糊
+     */
+    const val DEEP_BLUR = "@blur lerp 1 2"
 
     /**
      * 组合滤镜:黑白+模糊

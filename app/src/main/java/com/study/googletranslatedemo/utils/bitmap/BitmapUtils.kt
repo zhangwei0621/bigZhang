@@ -5,9 +5,11 @@ import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
 import android.graphics.BitmapFactory
 import android.net.Uri
+import androidx.core.graphics.scale
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import kotlin.math.min
 
 object BitmapUtils {
     fun uriToBitmap(
@@ -63,5 +65,46 @@ object BitmapUtils {
             }
         } catch (_: Exception) {
         }
+    }
+
+    /**
+     * 计算宽高适配后的bitmap的宽高参数
+     * @return <Width, Height>
+     */
+    fun calculateFitBitmap(
+        srcBitmap: Bitmap?,
+        containerWidth: Int,
+        containerHeight: Int
+    ): Pair<Int, Int> {
+        val invalidResult = 0 to 0
+        if (!srcBitmap.isValid()) return invalidResult
+        if (containerWidth <= 0 || containerHeight <= 0) return invalidResult
+        if (srcBitmap == null) return invalidResult
+        val minScale =
+            min(containerWidth * 1f / srcBitmap.width, containerHeight * 1f / srcBitmap.height)
+        return Pair(
+            (srcBitmap.width * minScale).toInt(),
+            (srcBitmap.height * minScale).toInt()
+        )
+    }
+
+    /**
+     * 生成宽高适配的新bitmap
+     */
+    fun createFitBitmap(
+        srcBitmap: Bitmap?,
+        containerWidth: Int,
+        containerHeight: Int
+    ): Bitmap? {
+        if (!srcBitmap.isValid()) return null
+        if (containerWidth <= 0 || containerHeight <= 0) return null
+        val minScale =
+            min(containerWidth * 1f / srcBitmap!!.width, containerHeight * 1f / srcBitmap.height)
+        val scaledBitmap =
+            srcBitmap.scale(
+                (srcBitmap.width * minScale).toInt(),
+                (srcBitmap.height * minScale).toInt()
+            )
+        return scaledBitmap
     }
 }

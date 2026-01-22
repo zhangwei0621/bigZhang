@@ -15,5 +15,6 @@ enum class DemoFunc(
     EditorDraw("Editor-Draw"),
     EditorDrawMosaic("Editor-Draw(Mosaic)"),
     EditorBlur("Editor-Blur"),
-    EditorSticker("Editor-Sticker")
+    EditorSticker("Editor-Sticker"),
+    EditorSqbg("Editor-SQ-BG")
 }

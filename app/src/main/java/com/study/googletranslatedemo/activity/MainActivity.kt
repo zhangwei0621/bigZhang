@@ -13,6 +13,7 @@ import com.study.googletranslatedemo.demo.editor.draw.MosaicDrawActivity
 import com.study.googletranslatedemo.demo.editor.effect.splash.FilterPaintActivity
 import com.study.googletranslatedemo.demo.editor.filter.FilterActivity
 import com.study.googletranslatedemo.demo.editor.frame.FrameActivity
+import com.study.googletranslatedemo.demo.editor.sqbg.SqbgActivity
 import com.study.googletranslatedemo.demo.editor.sticker.StickerActivity
 import com.study.googletranslatedemo.utils.filter.FilterRule
 
@@ -38,6 +39,7 @@ class MainActivity : BaseAct<ActivityMainBinding>() {
             DemoFunc.EditorDrawMosaic -> gotoAct(MosaicDrawActivity::class.java)
             DemoFunc.EditorBlur -> BlurImpl.start(this)
             DemoFunc.EditorSticker -> gotoAct(StickerActivity::class.java)
+            DemoFunc.EditorSqbg -> gotoAct(SqbgActivity::class.java)
         }
     }
 
