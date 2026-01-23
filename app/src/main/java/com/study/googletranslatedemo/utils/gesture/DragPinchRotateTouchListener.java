@@ -11,6 +11,7 @@ import android.view.View;
  * 2. 双指缩放：通过双指手势实现View的缩放
  * 3. 双指旋转：通过双指手势实现View的旋转
  */
+// TODO: 2026/1/23 拖拽的这几个实现是Ai扒竞品代码实现的，需要审核一下
 public class DragPinchRotateTouchListener implements View.OnTouchListener {
     // 当前活动的指针ID（用于跟踪单指拖拽）
     private int activePointerId = -1;
