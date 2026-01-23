@@ -2,6 +2,7 @@ package com.study.googletranslatedemo.utils.bitmap
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.Point
 import androidx.core.graphics.scale
 import com.study.googletranslatedemo.utils.bitmap.BitmapUtils.tryRecycle
@@ -54,8 +55,8 @@ class BitmapFitDrawHelper {
     /**
      * 渲染至容器中间
      */
-    fun drawToCenter(canvas: Canvas) {
-        canvas.drawBitmapToCenter(_fitBitmap, _containerWidth, _containerHeight)
+    fun drawToCenter(canvas: Canvas, paint: Paint? = null) {
+        canvas.drawBitmapToCenter(_fitBitmap, _containerWidth, _containerHeight, paint)
     }
 
     /**

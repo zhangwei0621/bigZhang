@@ -10,6 +10,7 @@ import com.study.googletranslatedemo.demo.editor.blur.BlurImpl
 import com.study.googletranslatedemo.demo.editor.crop.CropActivity
 import com.study.googletranslatedemo.demo.editor.draw.DrawActivity
 import com.study.googletranslatedemo.demo.editor.draw.MosaicDrawActivity
+import com.study.googletranslatedemo.demo.editor.effect.motion.MotionActivity
 import com.study.googletranslatedemo.demo.editor.effect.splash.FilterPaintActivity
 import com.study.googletranslatedemo.demo.editor.filter.FilterActivity
 import com.study.googletranslatedemo.demo.editor.frame.FrameActivity
@@ -40,6 +41,7 @@ class MainActivity : BaseAct<ActivityMainBinding>() {
             DemoFunc.EditorBlur -> BlurImpl.start(this)
             DemoFunc.EditorSticker -> gotoAct(StickerActivity::class.java)
             DemoFunc.EditorSqbg -> gotoAct(SqbgActivity::class.java)
+            DemoFunc.EditorEffectMotion -> gotoAct(MotionActivity::class.java)
         }
     }
 

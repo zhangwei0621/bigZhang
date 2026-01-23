@@ -11,6 +11,7 @@ enum class DemoFunc(
     EditorFilter("Editor-Filter"),
     EditorAdjust("Editor-Adjust"),
     EditorEffectSplash("Editor-Effect-Splash"),
+    EditorEffectMotion("Editor-Effect-Motion"),
     EditorFrame("Editor-Frame"),
     EditorDraw("Editor-Draw"),
     EditorDrawMosaic("Editor-Draw(Mosaic)"),

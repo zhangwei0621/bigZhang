@@ -36,6 +36,7 @@
         <activity android:name=".demo.editor.draw.MosaicDrawActivity" />
         <activity android:name=".demo.editor.sqbg.SqbgActivity" />
         <activity android:name=".develop.segmentation.SegmentationActivity" />
+        <activity android:name=".demo.editor.effect.motion.MotionActivity" />
     </application>
 
 </manifest>
