@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import androidx.core.graphics.scale
 import java.io.File
 import java.io.FileOutputStream
@@ -12,6 +13,8 @@ import java.io.InputStream
 import kotlin.math.min
 
 object BitmapUtils {
+    private const val TAG = "BitmapUtils"
+
     fun uriToBitmap(
         context: Context,
         uri: Uri,
@@ -32,6 +35,42 @@ object BitmapUtils {
         }
         return null
     }
+
+    fun smartUriToBitmap(
+        context: Context,
+        uri: Uri
+    ): Bitmap? {
+        var inputStream: InputStream? = null
+        var measureIs: InputStream? = null
+        try {
+            inputStream = context.contentResolver.openInputStream(uri)
+            measureIs = context.contentResolver.openInputStream(uri)
+            if (inputStream == null || measureIs == null) return null
+
+            val measureOption = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeStream(measureIs, null, measureOption)
+
+            val originalWidth = measureOption.outWidth
+            val originalHeight = measureOption.outHeight
+            if (originalWidth <= 0 || originalHeight <= 0) return null
+            val deviceDpi = context.resources.displayMetrics.densityDpi
+            val deviceWidth = context.resources.displayMetrics.widthPixels
+            val deviceHeight = context.resources.displayMetrics.heightPixels
+            val minScale = min(deviceWidth * 1f / originalWidth, deviceHeight * 1f / originalHeight)
+
+            return BitmapFactory.decodeStream(inputStream, null, BitmapFactory.Options().apply {
+                inDensity = deviceDpi
+                inTargetDensity = (deviceDpi * minScale).toInt()
+            })
+        } catch (e: Exception) {
+            Log.e(TAG, "smartUriToBitmap error: $e")
+        } finally {
+            measureIs?.close()
+            inputStream?.close()
+        }
+        return null
+    }
+
 
     fun Bitmap?.tryRecycle() {
         if (this != null && !this.isRecycled) {

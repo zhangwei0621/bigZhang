@@ -45,13 +45,7 @@ class SegmentationActivity : BaseAct<ActivitySegmentationBinding>() {
     }
 
     private fun loadImageFromUri(uri: Uri): Bitmap? {
-        val dpi = resources.displayMetrics.densityDpi
-        return BitmapUtils.uriToBitmap(
-            this,
-            uri,
-            dpi,
-            dpi / 4
-        )
+        return BitmapUtils.smartUriToBitmap(this, uri)
     }
 
     private fun loadLocalTestImage(): Bitmap {

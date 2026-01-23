@@ -64,6 +64,10 @@ class SegmentationHelper(
      * 分割图像，返回分割出来的图像
      */
     fun segmentImage(srcBitmap: Bitmap): Bitmap? {
+        Log.d(
+            _tag,
+            "Start segment, srcBitmap: {width=${srcBitmap.width},height=${srcBitmap.height},density=${srcBitmap.density}}"
+        )
         // 执行分割推理
         val srcMPImage: MPImage = BitmapImageBuilder(srcBitmap).build()
         val segmentResultMPImage = segmentImage(srcMPImage)?.categoryMask()?.get() ?: return null
@@ -95,7 +99,7 @@ class SegmentationHelper(
                 else -> Color.TRANSPARENT
             }
         }
-        Log.d(_tag, "$debugDic")
+        Log.d(_tag, "Segment result: $debugDic")
 
         if (!isObjectDetected) {
             return null
