@@ -9,6 +9,7 @@ import com.study.googletranslatedemo.databinding.ActivityDevelopBinding
 import com.study.googletranslatedemo.develop.decode.DecodeHelper
 import com.study.googletranslatedemo.develop.filtermask.FilterMaskActivity
 import com.study.googletranslatedemo.develop.paint.PaintActivity
+import com.study.googletranslatedemo.develop.segmentation.SegmentationActivity
 import com.study.googletranslatedemo.develop.shapemask.ShapeMaskActivity
 
 /**
@@ -30,6 +31,7 @@ class DevelopActivity : BaseAct<ActivityDevelopBinding>() {
             DevelopFunc.FilterMask -> gotoAct(FilterMaskActivity::class.java)
             DevelopFunc.Decode -> Log.d("decode", "${DecodeHelper().test()}")
             DevelopFunc.Paint -> gotoAct(PaintActivity::class.java)
+            DevelopFunc.Segmentation -> gotoAct(SegmentationActivity::class.java)
         }
     }
 

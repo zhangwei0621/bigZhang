@@ -14,15 +14,17 @@ import kotlin.math.min
 object BitmapUtils {
     fun uriToBitmap(
         context: Context,
-        uri: Uri
+        uri: Uri,
+        density: Int = 240,
+        targetDensity: Int = 120
     ): Bitmap? {
         var inputStream: InputStream? = null
         try {
             inputStream = context.contentResolver.openInputStream(uri)
             if (inputStream == null) return null
             return BitmapFactory.decodeStream(inputStream, null, BitmapFactory.Options().apply {
-                inJustDecodeBounds = false
-                inPreferredConfig = Bitmap.Config.ARGB_8888
+                inDensity = density
+                inTargetDensity = targetDensity
             })
         } catch (_: Exception) {
         } finally {

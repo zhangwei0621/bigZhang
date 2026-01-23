@@ -55,4 +55,7 @@ dependencies {
     implementation(libs.gpuimage.android)
     //图像裁切库
     implementation("com.vanniktech:android-image-cropper:4.7.0")
+
+    // 谷歌MediaPipe套件，有很多功能，目前我们只使用图像分割功能
+    implementation("com.google.mediapipe:tasks-vision:0.10.29")
 }

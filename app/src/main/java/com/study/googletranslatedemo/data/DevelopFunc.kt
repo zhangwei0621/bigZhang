@@ -9,5 +9,6 @@ enum class DevelopFunc(
     ShapeMask("形状裁剪遮罩"),
     FilterMask("滤镜+形状遮罩组合"),
     Decode("Decode"),
-    Paint("画笔测试")
+    Paint("画笔测试"),
+    Segmentation("人体分割测试")
 }
