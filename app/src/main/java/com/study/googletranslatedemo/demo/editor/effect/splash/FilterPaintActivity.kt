@@ -6,8 +6,8 @@ import com.study.googletranslatedemo.base.BaseAct
 import com.study.googletranslatedemo.databinding.ActivityFilterPaintBinding
 import com.study.googletranslatedemo.utils.OperateStackListener
 import com.study.googletranslatedemo.utils.PhotoPicker
-import com.study.googletranslatedemo.utils.expand.addParams
 import com.study.googletranslatedemo.utils.bitmap.BitmapUtils
+import com.study.googletranslatedemo.utils.expand.addParams
 import com.study.googletranslatedemo.utils.expand.createIntent
 import com.study.googletranslatedemo.utils.expand.getString
 import com.study.googletranslatedemo.utils.expand.start
@@ -34,7 +34,7 @@ class FilterPaintActivity : BaseAct<ActivityFilterPaintBinding>() {
             binding.img.filter = filter
         }
         _photoPicker.register(this) { uri ->
-            BitmapUtils.uriToBitmap(this, uri)?.let { bmp ->
+            BitmapUtils.smartUriToBitmap(this, uri)?.let { bmp ->
                 binding.img.setImageBitmap(bmp)
             }
         }

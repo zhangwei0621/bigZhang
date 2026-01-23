@@ -17,7 +17,7 @@ import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatImageView
 import com.study.googletranslatedemo.utils.OperateStackListener
 import com.study.googletranslatedemo.utils.expand.dp
-import org.wysaid.nativePort.CGENativeLibrary
+import com.study.googletranslatedemo.utils.filter.FilterImage
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -125,9 +125,6 @@ class MosaicPaintView @JvmOverloads constructor(
 
     init {
         brushSize = 25f.dp(context)
-//
-//        setLayerType(LAYER_TYPE_HARDWARE, null)
-//        setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
     /**
@@ -165,9 +162,10 @@ class MosaicPaintView @JvmOverloads constructor(
     }
 
     override fun setImageBitmap(bm: Bitmap?) {
-        if (bm != null) {
+        val filterBitmap = FilterImage.applyFilter(bm, _blurFilter, 1f)
+        if (bm != null && filterBitmap != null) {
             _blurShader = BitmapShader(
-                CGENativeLibrary.filterImage_MultipleEffects(bm, _blurFilter, 1f),
+                filterBitmap,
                 Shader.TileMode.CLAMP,
                 Shader.TileMode.CLAMP
             )

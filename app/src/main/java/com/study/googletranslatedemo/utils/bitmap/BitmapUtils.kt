@@ -15,6 +15,7 @@ import kotlin.math.min
 object BitmapUtils {
     private const val TAG = "BitmapUtils"
 
+    @Deprecated("推荐优先使用 smartUriToBitmap")
     fun uriToBitmap(
         context: Context,
         uri: Uri,
@@ -36,6 +37,9 @@ object BitmapUtils {
         return null
     }
 
+    /**
+     * 从Uri加载一个bitmap，并智能控制其尺寸
+     */
     fun smartUriToBitmap(
         context: Context,
         uri: Uri

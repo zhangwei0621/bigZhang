@@ -27,7 +27,8 @@ class MosaicDrawActivity : BaseAct<ActivityDrawMosaicBinding>() {
 
     override fun initView() {
         _photoPicker.register(this) { uri ->
-            BitmapUtils.uriToBitmap(this, uri)?.let { bmp ->
+            BitmapUtils.smartUriToBitmap(this, uri)?.let { bmp ->
+                // FIXME: 这个里面原图的缩放写错了，需要修正
                 binding.paintView.setImageBitmap(bmp)
             }
         }

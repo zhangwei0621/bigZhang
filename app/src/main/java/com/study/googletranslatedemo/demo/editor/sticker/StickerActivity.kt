@@ -55,7 +55,7 @@ class StickerActivity : BaseAct<ActivityStickerBinding>() {
         binding.pbLoading.visibility = View.VISIBLE
         // 加载测试图像
         val srcBitmap = withContext(Dispatchers.IO) {
-            BitmapUtils.uriToBitmap(context, uri)
+            BitmapUtils.smartUriToBitmap(context, uri)
         }
         if (srcBitmap == null) {
             binding.pbLoading.visibility = View.GONE

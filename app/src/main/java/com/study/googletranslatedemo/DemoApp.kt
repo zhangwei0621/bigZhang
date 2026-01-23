@@ -12,7 +12,7 @@ import java.io.InputStream
 class DemoApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        // 注册CGE图像加载方法
+        // 注册CGE图像加载方法，用到文件的特效滤镜会从这加载文件为bitmap
         CGENativeLibrary.setLoadImageCallback(object : CGENativeLibrary.LoadImageCallback {
             // 加载图像为bitmap
             override fun loadImage(name: String?, arg: Any?): Bitmap? {

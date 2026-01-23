@@ -15,7 +15,7 @@ class CropActivity : BaseAct<ActivityCropBinding>() {
 
     override fun initView() {
         _photoPicker.register(this) { uri ->
-            BitmapUtils.uriToBitmap(this, uri)?.let { bmp ->
+            BitmapUtils.smartUriToBitmap(this, uri)?.let { bmp ->
                 binding.cropImageView.setImageBitmap(bmp)
             }
         }

@@ -31,7 +31,7 @@ class AdjustActivity : BaseAct<ActivityAdjustBinding>() {
 
     override fun initView() {
         _photoPicker.register(this) { uri ->
-            BitmapUtils.uriToBitmap(this, uri)?.let { bmp ->
+            BitmapUtils.smartUriToBitmap(this, uri)?.let { bmp ->
                 _srcBitmap = bmp
                 reset()
             }
